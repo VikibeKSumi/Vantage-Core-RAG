@@ -1,0 +1,13 @@
+project_name: "Akshara-RAG"
+models:
+  embedding: "BAAI/bge-small-en-v1.5" # Very lightweight
+  reranker: "BAAI/bge-reranker-base"   # Downsized from 'v2-m3'
+
+database:
+  type: "qdrant"
+  path: "./data/qdrant_storage" # Local storage for dev
+  collection_name: "indic_corpus"
+
+ingestion:
+  chunk_size: 512
+  overlap: 50

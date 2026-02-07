@@ -1,0 +1,13 @@
+# AI Core
+sentence-transformers
+
+# LlamaIndex 2026 Stable Release
+llama-index
+llama-index-vector-stores-qdrant
+llama-index-embeddings-huggingface
+
+# DB & Utilities
+qdrant-client
+pyyaml
+python-dotenv
+pandas
