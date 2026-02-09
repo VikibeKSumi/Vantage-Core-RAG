@@ -20,7 +20,9 @@ def main():
     print(f"Loaded {len(documents)} document pages.")
 
     #2. Parsing
-    parser = SentenceSplitter(chunk_size=1024, chunk_overlap=20)
+    chunk_size = config["ingestion"]["chunk_size"]
+    chunk_overlap = config["ingestion"]["overlap"]
+    parser = SentenceSplitter(chunk_size=chunk_size, chunk_overlap=chunk_overlap)
     nodes = parser.get_nodes_from_documents(documents)
 
     

@@ -10,5 +10,5 @@ database:
   collection_name: "indic_corpus"
 
 ingestion:
-  chunk_size: 512
-  overlap: 50
+  chunk_size: 1024
+  overlap: 20
