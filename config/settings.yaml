@@ -1,5 +1,6 @@
-project_name: "Akshara-RAG"
+project_name: "vantage_core_RAG"
 models:
+  llm: "llama-3.3-70b-versatile" # High intelligence, low latency
   embedding: "BAAI/bge-small-en-v1.5" # Very lightweight
   reranker: "BAAI/bge-reranker-base"   # Downsized from 'v2-m3'
 

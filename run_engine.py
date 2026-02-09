@@ -1,12 +1,9 @@
-# FORCE OFFLINE MODE: This prevents the timeout by skipping the HF Hub check
-#os.environ['TRANSFORMERS_OFFLINE'] = '1'
-#os.environ['HF_DATASETS_OFFLINE'] = '1'
-
 import os
 import yaml
 from dotenv import load_dotenv
 from llama_index.core import VectorStoreIndex
 from llama_index.embeddings.huggingface import HuggingFaceEmbedding
+from llama_index.core.schema import MetadataMode
 from src.ai_core import AICore
 from src.database import VectorDBManager
 from src.search_logic import SemanticSearcher
@@ -26,8 +23,7 @@ def main():
         return
     
 
-    
-    #1. Load vector index from Qdrant (Load from disk)
+        #1. Load vector index from Qdrant (Load from disk)
     db_manager = VectorDBManager(config)
 
     llama_embed_model = HuggingFaceEmbedding(
@@ -40,7 +36,7 @@ def main():
     )
     
     #2. Run interactive query
-    print("\n--- Akshara Strategic Engine Online ---")
+    print("\n---Engine Online ---")
     query = input("Type your question: ")
 
     
@@ -57,14 +53,14 @@ def main():
         # Print the Top Match specifically
         top_match = retrieved_nodes[0]
         print(f"\n--- TOP CONTEXT (Score: {top_match.score:.4f}) ---")
-        print(f"TEXT: {top_match.text}")
-        print(f"SOURCE: {top_match.metadata}")
+        print(f"TEXT: {top_match.node.get_content(metadata_mode=MetadataMode.NONE)}")
+        print(f"SOURCE: {top_match.node.metadata.get('file_name', 'Unknown')}")
         print("-" * 40)
 
         print("\n[Thinking...]")
-        generator = Generator(api_key=api_key)
+        generator = Generator(model=config['models']['llm'], api_key=api_key)
         final_answer = generator.generate_response(query, retrieved_nodes)
-        print(f"\nADVISOR RESPONSE:\n{final_answer}")
+        print(f"\RESPONSE:\n{final_answer}")
         
     else:
         print("I have no data in the repository to answer that.")
