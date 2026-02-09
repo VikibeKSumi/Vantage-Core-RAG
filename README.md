@@ -22,3 +22,12 @@ Unlike "Naive RAG" systems that rely on a single search step, Vantage Core-RAG u
 1. Clone the repo and install dependencies:
    ```bash
    pip install -r requirements.txt
+2. Add your industrial PDFs to data/raw_docs/.
+
+3. Ingest the data:
+    ```bash
+    python ingest_data.py
+    
+4. Ask the Architect:
+    ```bash
+    python run_engine.py
