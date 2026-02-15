@@ -10,4 +10,8 @@ llama-index-embeddings-huggingface
 qdrant-client
 pyyaml
 python-dotenv
+
+#UI and evaluation
+streamlit>=1.32.0
 pandas
+tabulate

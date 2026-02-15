@@ -18,16 +18,44 @@ Unlike "Naive RAG" systems that rely on a single search step, Vantage Core-RAG u
 - **Multilingual Ready:** Integrated Unicode normalization for Indic script consistency.
 - **Local-First Sovereignty:** All sensitive document embeddings and vector storage remain on the local machine.
 
+
+
+
+## 🐳 Docker Deployment
+
+1. Build the Container:
+   ```bash
+   docker build -t vantage-core-rag .
+2.  Run the Container:
+    ```Bash
+    docker run -p 8501:8501 --env-file .env vantage-core-rag
+
+
 ## 🚀 Quick Start
+
 1. Clone the repo and install dependencies:
    ```bash
    pip install -r requirements.txt
-2. Add your industrial PDFs to data/raw_docs/.
+
+2.  This project uses a document corpus for RAG.
+Supported sources:
+- PDFs
+- Markdown
+- Plain text
+
+Example documents are provided in `data/raw_docs/`.
+
+To use your own corpus:
+- Delete existing docs in `data/raw_docs/`
+- Place documents in `data/raw_docs/`
 
 3. Ingest the data:
     ```bash
     python ingest_data.py
     
-4. Ask the Architect:
+4. Ask the question in context:
     ```bash
     python run_engine.py
+
+
+

@@ -1,118 +1,223 @@
-# RAG Engine: Technical Architecture Map
+# Vantage Core-RAG — Technical Architecture Map
 
-## 📂 Project Structure
-- `data/` : Local storage for raw text files and the Qdrant vector database.
-- `src/` : The core logic of the AI system.
-- `config/` : Configuration files (settings.yaml) for model names and paths.
-- `.env` : Secure storage for your API keys (Groq/Gemini).
+1. System Objective
 
-## 🛠️ Module & Function Breakdown
+Vantage Core-RAG is a local-first, resource-constrained RAG engine designed to deliver industrial-grade retrieval precision on consumer hardware (≈4GB VRAM / CPU-heavy).
 
-### 1. The Muscle: `src/ai_core.py` (AICore)
-- `__init__`: Initializes the BGE-Small (Bi-Encoder) and BGE-Reranker (Cross-Encoder) models on the CPU.
-- `preprocess_indic_text(text)`: Normalizes Devanagari/Hindi scripts to ensure math vectors are consistent across different typing styles.
-- `compute_rerank_scores(query, nodes)`: Compares the query to retrieved results line-by-line to find the absolute best match.
+The system prioritizes:
+- deterministic retrieval quality,
+- memory-aware design,
+- modular extensibility,
+- sovereignty of data (no external embedding or vector storage).
 
-### 2. The Vault: `src/database.py` (VectorDBManager)
-- `get_vector_store()`: Connects the engine to the Qdrant local database.
-- `get_storage_context()`: Defines the persistent storage path on your hard drive.
+2. Core Architectural Principle
 
-### 3. The Eyes: `src/search_logic.py` (SemanticSearcher)
-- `search_and_rank(query, index)`: 
-    1. Pre-processes the query.
-    2. Performs a hybrid vector search.
-    3. Triggers the Reranker to pick the top 3-5 high-quality results.
+Two-Stage Retrieval beats single-pass RAG under constrained hardware.
 
-### 4. The Voice: `src/generation.py` (Generator)
-- `generate_response(query, nodes)`: Takes the raw context from the vault, packages it into a prompt, and sends it to **Groq (Llama 3.3 70B)** to generate a professional "Architect" response.
+Instead of relying on a single dense retrieval step (“naive RAG”), Vantage Core-RAG splits retrieval into orthogonal responsibilities:
+- Stage 1 (Recall-Optimized): Fast, low-memory semantic search
+- Stage 2 (Precision-Optimized): Deep neural relevance verification
 
-## 🚀 The Execution Flow
-1. **User Query** (run_engine.py) → 
-2. **Text Normalization** (ai_core.py) → 
-3. **Vector Retrieval** (database.py + search_logic.py) → 
-4. **Precision Reranking** (ai_core.py) → 
-5. **AI Synthesis** (generation.py via Groq) → 
-6. **Final Advisor Response**
+This separation allows the system to:
+- maximize recall cheaply,
+- apply expensive reasoning only where it matters,
+- remain performant on CPU-only environments.
+
+3. High-Level System Flow
+               ┌────────────────────┐
+               │   Raw Documents     │
+               │ (PDF / MD / Text)   │
+               └─────────┬──────────┘
+                         │
+               [ Ingestion Pipeline ]
+                         │
+        ┌────────────────▼────────────────┐
+        │  Chunking + Normalization        │
+        │  (Unicode-safe, Indic-ready)     │
+        └────────────────┬────────────────┘
+                         │
+        ┌────────────────▼────────────────┐
+        │  Bi-Encoder Embedding            │
+        │  (BGE-Small-en-v1.5, CPU)        │
+        └────────────────┬────────────────┘
+                         │
+        ┌────────────────▼────────────────┐
+        │  Local Vector Store              │
+        │  (Qdrant, disk-backed)           │
+        └────────────────┬────────────────┘
+                         │
+              ┌──────────▼──────────┐
+              │     User Query       │
+              └──────────┬──────────┘
+                         │
+        ┌────────────────▼────────────────┐
+        │  Stage 1: Dense Retrieval        │
+        │  (Top-K candidates)              │
+        └────────────────┬────────────────┘
+                         │
+        ┌────────────────▼────────────────┐
+        │  Stage 2: Cross-Encoder Rerank   │
+        │  (BGE-reranker-base)             │
+        └────────────────┬────────────────┘
+                         │
+        ┌────────────────▼────────────────┐
+        │  Context Selection               │
+        │  (Token-budget aware)            │
+        └────────────────┬────────────────┘
+                         │
+        ┌────────────────▼────────────────┐
+        │  LLM Generation (Groq)            │
+        │  (Llama 3.3 70B)                  │
+        └────────────────┬────────────────┘
+                         │
+                 ┌───────▼───────┐
+                 │ Final Answer   │
+                 └───────────────┘
+
+4. Ingestion Pipeline (Index Construction)
+4.1 Document Discovery
+
+- Recursive directory traversal (data/raw_docs/)
+- Supports: PDFs; Markdown; Plain text
+- Implemented via SimpleDirectoryReader
+
+Design rationale:
+Directory-based ingestion mirrors real industrial knowledge bases (policy folders, manuals, reports).
+
+4.2 Text Normalization & Chunking
+
+Each document undergoes:
+- Unicode normalization (critical for Indic scripts),
+- whitespace and encoding cleanup,
+- deterministic chunking.
+- Chunking strategy:
+- fixed-size, overlap-aware,
+- optimized to balance:
+- embedding fidelity,
+- reranker effectiveness,
+- LLM token limits.
+
+4.3 Bi-Encoder Embedding (Stage 1 Backbone)
+
+Model: BGE-Small-en-v1.5
+Runtime: CPU
+Memory footprint: ~133 MB
+
+Why this model:
+- Excellent semantic recall per MB,
+- Stable embedding space,
+- Proven industry adoption,
+- Viable for low-VRAM machines.
+- Each chunk → dense vector → metadata preserved.
+
+4.4 Vector Persistence (Qdrant)
+
+Deployment: Local Qdrant instance
+Storage: Disk-backed, persistent
+Data kept locally: embeddings + metadata only
+
+Why Qdrant:
+- Production-grade ANN search,
+- Efficient filtering,
+- Strong Python ecosystem,
+- No cloud dependency.
+
+5. Query Pipeline (RAG Execution)
+5.1 Query Encoding
+
+- User query embedded using same bi-encoder
+- Ensures embedding space alignment
+- Zero external calls at this stage
+
+5.2 'Stage 1' — Semantic Retrieval (Recall)
+
+- Qdrant performs ANN search
+- Returns top-K candidate chunks
+- Optimized for: speed; broad semantic coverage.
+
+Important:
+At this stage, precision is intentionally sacrificed for recall.
+
+5.3 'Stage 2' — Neural Re-Ranking (Precision)
+
+Model: BGE-Reranker-Base
+Mechanism: Cross-encoder (query + passage jointly)
+
+Scores each candidate pairwise
+
+Why cross-encoder here:
+- Deep token-level interaction,
+- Strong semantic disambiguation,
+- Removes “semantic noise” common in dense retrieval.
+- Only the highest-scoring passages survive.
+
+5.4 Context Assembly
+
+Top reranked chunks selected
+Token-budget aware trimming
+Sources preserved for traceability
+
+This ensures:
+- maximal relevance per token,
+- minimal hallucination surface.
+
+5.5 Generation Layer (LLM)
+
+Provider: Groq
+Model: Llama 3.3 70B
+Reason: ultra-low latency inference
+
+Architectural decision:
+- Retrieval & reasoning → local
+- Generation → remote accelerator
+
+This clean separation:
+- preserves data sovereignty,
+- avoids local GPU dependency,
+- achieves near-real-time responses.
+
+6. Hardware-Aware Design Strategy
+Component	Execution
+Chunking	CPU
+Embedding	CPU / RAM
+Reranking	CPU
+Vector Search	Disk + RAM
+Generation	Groq (remote)
+
+Key insight:
+Memory pressure is managed by moving intelligence into architecture, not hardware.
+
+7. Failure Modes Addressed
+Problem	Mitigation
+Semantic drift	Cross-encoder reranking
+Hallucination	Aggressive context filtering
+VRAM exhaustion	CPU-only retrieval
+Vendor lock-in	Modular model boundaries
+Data leakage	Local-first embeddings
+
+8. Extensibility Points
+
+Vantage Core-RAG is intentionally modular:
+Swap bi-encoder (e.g., domain-specific)
+Add hybrid BM25 + dense retrieval
 
 
-# Vantage-Core-RAG — Technical Map
+Plug in:
+local LLM,
+multi-index routing,
+evaluation harness,
+agentic query rewriting.
+No architectural rewrite required.
 
-> **One-line summary**:  
-> Vantage-Core-RAG is a modular Retrieval-Augmented Generation (RAG) engine that ingests unstructured documents, builds an embedding index, and exposes a query pipeline that routes user questions through retrieval + LLM generation.
 
----
+9. Why This Is Not “Toy RAG”
 
-## 1. Design Goals
+- This system demonstrates:
+- Industrial retrieval patterns
+- Hardware-constrained engineering
+- Clear separation of recall vs precision
+- Production-grade vector infrastructure
+- Explicit trade-off reasoning
 
-Vantage-Core-RAG was built with the following goals:
 
-1. **Top-down clarity**  
-   - Start from the *RAG system design* and then map that cleanly into code modules.
-   - Make it easy to “walk” an interviewer from diagram → implementation.
-
-2. **Modularity & Swap-ability**  
-   - Encapsulate embeddings, vector store, retriever, and generator so they can be swapped:
-     - Different embedding models (OpenAI, local, etc.)
-     - Different vector stores (FAISS / Chroma / Qdrant / etc.)
-     - Different LLM backends.
-
-3. **Separation of Concerns**  
-   - **Ingestion path** (index building) and **query path** (RAG pipeline) are cleanly separated.
-   - Config + secrets live in one place; business logic in another.
-
-4. **Learning & Extension**  
-   - Code structured so new features (multi-tenant indexes, eval harness, UI, multimodal RAG) can be added without rewriting the core.
-
----
-
-## 2. High-level Architecture
-
-At a high level, the system has two main flows:
-
-1. **Ingestion / Indexing Flow**
-   - Raw documents → chunking → embeddings → vector store  
-2. **Query / RAG Flow**
-   - User query → retrieval over index → context assembly → LLM generation → response
-
-Conceptually, the architecture looks like this:
-
-```text
-            ┌────────────────┐
-            │   Data Source   │  (PDFs, Markdown, text, etc.)
-            └───────┬────────┘
-                    │
-          [1] Ingestion / Indexing
-                    │
-        ┌───────────▼────────────┐
-        │  Chunker + Preprocessor│
-        └───────────┬────────────┘
-                    │
-        ┌───────────▼────────────┐
-        │   Embedding Model      │
-        └───────────┬────────────┘
-                    │
-        ┌───────────▼────────────┐
-        │     Vector Store       │
-        └───────────┬────────────┘
-                    │
-          [2] Query / RAG
-                    │
-             ┌──────▼───────┐
-             │ User Query   │
-             └──────┬───────┘
-                    │
-             ┌──────▼───────┐
-             │  Retriever    │
-             └──────┬───────┘
-                    │
-             ┌──────▼────────────┐
-             │ Context Assembler  │
-             └──────┬────────────┘
-                    │
-             ┌──────▼───────┐
-             │   LLM / RAG   │
-             └──────┬───────┘
-                    │
-             ┌──────▼───────┐
-             │  Response     │
-             └───────────────┘
+It is designed as a core engine, not a demo notebook.

@@ -205,3 +205,10 @@ cython_debug/
 marimo/_static/
 marimo/_lsp/
 __marimo__/
+
+
+# IN RAG
+__pycache__/
+*.pyc
+data/qdrant_storage/
+.DS_Store
