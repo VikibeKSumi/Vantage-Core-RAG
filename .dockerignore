@@ -1,0 +1,9 @@
+# Ignore the environment
+venv/
+.env
+.git/
+__pycache__/
+*.pyc
+
+# Ignore local storage (we want a fresh start or mounted volume)
+data/qdrant_storage/

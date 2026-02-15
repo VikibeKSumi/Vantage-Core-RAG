@@ -21,18 +21,8 @@ Unlike "Naive RAG" systems that rely on a single search step, Vantage Core-RAG u
 
 
 
-## 🐳 Docker Deployment
-
-1. Build the Container:
-   ```bash
-   docker build -t vantage-core-rag .
-2.  Run the Container:
-    ```Bash
-    docker run -p 8501:8501 --env-file .env vantage-core-rag
-
 
 ## 🚀 Quick Start
-
 1. Clone the repo and install dependencies:
    ```bash
    pip install -r requirements.txt
