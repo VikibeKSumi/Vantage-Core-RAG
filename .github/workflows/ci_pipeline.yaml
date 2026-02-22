@@ -26,7 +26,6 @@ jobs:
         with:
           context: .
           push: true
-          # REPLACE 'your-username' below with your actual Docker Hub username!
           tags: ${{ secrets.DOCKER_USERNAME }}/vantage_core_rag:latest
         
       # 4. Poke Render to tell it to update

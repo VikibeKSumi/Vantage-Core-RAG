@@ -1,4 +1,3 @@
-import os
 from llama_index.llms.groq import Groq
 from llama_index.core.schema import MetadataMode
 
