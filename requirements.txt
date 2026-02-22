@@ -6,6 +6,7 @@ indic-nlp-library==0.92
 llama-index
 llama-index-vector-stores-qdrant
 llama-index-embeddings-huggingface
+llama-index-llms-groq
 
 # DB & Utilities
 qdrant-client
