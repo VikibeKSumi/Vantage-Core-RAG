@@ -42,7 +42,6 @@ def main():
         storage_context=storage_context,
         embed_model=llama_embed_model 
     )
-    
     print("✅ Industrial Ingestion Complete.")
 
 

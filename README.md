@@ -51,7 +51,7 @@ To use your own corpus:
 
 3. Ingest the data:
     ```bash
-    python ingest_data.py
+    python ingestion.py
     
 4. Ask the question in context:
     ```bash
