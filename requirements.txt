@@ -1,5 +1,6 @@
 # AI Core
 sentence-transformers
+indic-nlp-library==0.92
 
 # LlamaIndex 2026 Stable Release
 llama-index
