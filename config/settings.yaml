@@ -1,6 +1,13 @@
+# =============================================================================
+# Vantage Core RAG Configuration
+# =============================================================================
+# API keys (GROQ, etc.) go in .env file — never here
+# All other settings stay in this file
+
+
 project_name: "vantage_core_RAG"
 models:
-  llm: "llama-3.3-70b-versatile" # High intelligence, low latency
+  llm: "llama-3.1-8b-instant" # High intelligence, low latency
   embedding: "BAAI/bge-small-en-v1.5" # Very lightweight
   reranker: "BAAI/bge-reranker-base"   # Downsized from 'v2-m3'
 
@@ -12,3 +19,7 @@ database:
 ingestion:
   chunk_size: 1024
   overlap: 20
+
+device:
+  device: 'cuda'
+  
