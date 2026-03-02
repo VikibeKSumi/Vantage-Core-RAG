@@ -214,3 +214,5 @@ data/qdrant_storage/
 .DS_Store
 *.pyo
 *.pyd
+technical.md
+

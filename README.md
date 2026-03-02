@@ -47,24 +47,22 @@ This eliminates semantic noise and gives the LLM only the most relevant context 
 ---
 
 ### 📈 Current Performance (on 4GB VRAM + 5.6GB RAM)
-## data set used is (economic survey of India 26-27 and Union Budget FYI27)
-Average Latency: ~21 seconds
-Retrieval + Rerank: 0.59s
-Peak VRAM: 1.26 GB
-Empty Retrieval Rate: 0%
+(data set used is economic survey of India 26-27 and Union Budget FYI27 )
+- Average Latency: ~21 seconds
+- Retrieval + Rerank: 0.59s
+- Peak VRAM: 1.26 GB
+- Empty Retrieval Rate: 0%
 
 ---
 
 
 ### 🚀 Quick Start
 
-#### 1. Setup Environment
 # 1. Clone the repository
 ```bash
     git clone https://github.com/yourusername/vantage_core_rag.git
     cd vantage_core_rag
 ```
-
 # 2. Create and activate environment
 ```bash
     conda create -n vantage python=3.10 -y
@@ -76,13 +74,14 @@ Empty Retrieval Rate: 0%
     pip install -r requirements.txt
 ```
 
-# 4. Create .env file and add your Groq API key
-#    (Create a file named .env in the root folder and put this line inside it)
+# 4. Add your Groq API key 
+(Create a file named .env in the root folder and put this line inside it)
 ```env
     GROQ_API_KEY=gsk_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
 ```
 
-# 5. Put your PDF files (Budget, Economic Survey, etc.) inside this folder:
+# 5. Put your PDF files
+(Budget, Economic Survey provided inside this folder)
 ```text
     data/raw_docs/
 ```
@@ -101,12 +100,7 @@ Empty Retrieval Rate: 0%
 ```bash
     python run_eval.py
 ```
-
----
-
-
-Type your questions in the terminal after running python run.py.
-Type 'exit' to 'quit'.
+Type your questions in the terminal after running python run.py. Type 'exit' to quit.
 
 ---
 
@@ -138,6 +132,7 @@ vantage_core_rag/
 - LangChain and Observability
 
 ### 🙏 Acknowledgments
-Assisted and Informed greatly by Grok (xAI)
-Pytorch, LLamaIndex,
+- Assisted and Informed greatly by Grok (xAI
+- Pytorch
+- LLamaIndex
 
