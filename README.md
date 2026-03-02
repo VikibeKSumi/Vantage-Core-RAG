@@ -1,61 +1,143 @@
 # Vantage Core-RAG
-### Bi-Encoder Optimized Two-Stage Retrieval Pipeline (Local-First)
 
-Vantage Core-RAG is a high-performance, resource-optimized Retrieval-Augmented Generation (RAG) engine. It is designed to run on consumer-grade hardware (4GB VRAM) while maintaining industrial-grade precision through a two-stage retrieval and re-ranking architecture.
+**High-Performance • Resource-Optimized • Indic-Ready**  
+*Bi-Encoder + Cross-Encoder Two-Stage RAG Engine for Consumer Hardware*
 
-## 🏗️ Architecture: The Two-Stage Advantage
-Unlike "Naive RAG" systems that rely on a single search step, Vantage Core-RAG utilizes a sophisticated two-stage pipeline:
+![Python](https://img.shields.io/badge/Python-3.10+-blue)
+![GPU](https://img.shields.io/badge/GPU-4GB_VRAM-green)
+![Qdrant](https://img.shields.io/badge/VectorDB-Qdrant-orange)
+![Groq](https://img.shields.io/badge/LLM-Groq-purple)
 
-1.  **Stage 1: Semantic Retrieval (Bi-Encoder)** - Uses `BGE-Small-en-v1.5` to perform high-speed vector search across a local Qdrant database.
-    - Optimized for low memory footprint (133MB) to ensure sub-second retrieval on CPU.
-2.  **Stage 2: Neural Re-Ranking (Cross-Encoder)**
-    - Employs a `BGE-Reranker-Base` to analyze the top candidates side-by-side with the query.
-    - Eliminates "semantic noise" and ensures the LLM only receives the most mathematically relevant context.
+---
 
-## 🛠️ Key Features
-- **Hybrid Industrial Ingestion:** Recursive directory parsing for PDFs, Markdown, and Unstructured text using `SimpleDirectoryReader`.
-- **Hardware-Aware Design:** Orchestrated to run embedding and re-ranking on CPU/RAM, offloading heavy generation to Groq (Llama 3.3 70B) for ultra-fast inference.
-- **Multilingual Ready:** Integrated Unicode normalization for Indic script consistency.
-- **Local-First Sovereignty:** All sensitive document embeddings and vector storage remain on the local machine.
+### Why Vantage Core-RAG?
+
+A clean, production-grade Retrieval-Augmented Generation system designed to run **efficiently on modest hardware** (4GB VRAM + 5.6GB RAM) while delivering **industrial-grade retrieval quality**.
+
+It uses a **true two-stage architecture**:
+1. **Fast Semantic Search** (BGE-Small)
+2. **Neural Re-ranking** (BGE-Reranker-Base)
+
+This eliminates semantic noise and gives the LLM only the most relevant context — resulting in more accurate and grounded answers.
+
+---
+
+### ✨ Key Features
+
+- Two-stage retrieval (Bi-Encoder + Cross-Encoder) for superior relevance
+- Full GPU acceleration (embedding + reranking)
+- Local Qdrant vector database (persistent & hybrid search ready)
+- Indic text normalization (Devanagari handling)
+- Comprehensive performance metrics & evaluation suite
+- Centralized configuration + clean architecture
+- Fully Docker-ready
+- Extremely low memory footprint
+
+---
+
+### 🛠 Tech Stack
+
+- **Embedding**: `BAAI/bge-small-en-v1.5`
+- **Reranker**: `BAAI/bge-reranker-base`
+- **Vector Store**: Qdrant (local)
+- **LLM**: Groq (llama-3.1-8b-instant)
+- **Framework**: LlamaIndex + Sentence-Transformers
+- **UI/CLI**: Streamlit-ready + CLI
+
+---
+
+### 📈 Current Performance (on 4GB VRAM + 5.6GB RAM)
+## data set used is (economic survey of India 26-27 and Union Budget FYI27)
+Average Latency: ~21 seconds
+Retrieval + Rerank: 0.59s
+Peak VRAM: 1.26 GB
+Empty Retrieval Rate: 0%
+
+---
 
 
+### 🚀 Quick Start
 
+#### 1. Setup Environment
+# 1. Clone the repository
+```bash
+    git clone https://github.com/yourusername/vantage_core_rag.git
+    cd vantage_core_rag
+```
 
-## 🐳 Docker Deployment
+# 2. Create and activate environment
+```bash
+    conda create -n vantage python=3.10 -y
+    conda activate vantage
+```
 
-1. Build the Container:
-   ```bash
-   docker build -t vantage-core-rag .
-2.  Run the Container:
-    ```Bash
-    docker run -p 8501:8501 --env-file .env vantage-core-rag
+# 3. Install dependencies
+```bash
+    pip install -r requirements.txt
+```
 
+# 4. Create .env file and add your Groq API key
+#    (Create a file named .env in the root folder and put this line inside it)
+```env
+    GROQ_API_KEY=gsk_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+```
 
-## 🚀 Quick Start
+# 5. Put your PDF files (Budget, Economic Survey, etc.) inside this folder:
+```text
+    data/raw_docs/
+```
 
-1. Clone the repo and install dependencies:
-   ```bash
-   pip install -r requirements.txt
-
-2.  This project uses a document corpus for RAG.
-Supported sources:
-- PDFs
-- Markdown
-- Plain text
-
-Example documents are provided in `data/raw_docs/`.
-
-To use your own corpus:
-- Delete existing docs in `data/raw_docs/`
-- Place documents in `data/raw_docs/`
-
-3. Ingest the data:
-    ```bash
+# 6. Ingest the documents
+```bash
     python ingestion.py
-    
-4. Ask the question in context:
-    ```bash
-    python run_engine.py
+```
+
+# 7. Run the RAG Engine
+```bash
+    python run.py
+```
+
+# 8. (Optional but recommended) Run full evaluation
+```bash
+    python run_eval.py
+```
+
+---
 
 
+Type your questions in the terminal after running python run.py.
+Type 'exit' to 'quit'.
+
+---
+
+### 📁 Folder Structure
+
+```text
+vantage_core_rag/
+├── run.py                    # Main CLI
+├── ingestion.py              # Ingest documents
+├── run_eval.py               # Full evaluation
+├── src/
+│   ├── engine_load.py        # Core engine (loads once)
+│   ├── retrieve_and_rerank.py
+│   ├── config.py
+│   └── ...
+├── config/settings.yaml
+├── data/raw_docs/            # ← Put your PDFs here
+└── evaluation_results.csv
+```
+
+## 🛣 Roadmap
+
+- Contextual compression (reduce tokens)
+- Semantic caching
+- Query rewriting / HyDE
+- Streamlit UI
+- Faithfulness evaluation
+- Docker optimization
+- LangChain and Observability
+
+### 🙏 Acknowledgments
+Assisted and Informed greatly by Grok (xAI)
+Pytorch, LLamaIndex,
 

@@ -9,7 +9,7 @@ from dotenv import load_dotenv
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
 from src.ai_core import AICore
-from src.search_logic import SemanticSearcher
+from retrieve_and_rerank import SemanticSearcher
 from src.generation import Generator
 from src.database import VectorDBManager
 from llama_index.core import VectorStoreIndex, StorageContext
@@ -28,6 +28,7 @@ TEST_QUERIES = [
 ]
 
 def run_evaluation():
+    
     print("--- 🧪 Starting Vantage Core-RAG Evaluation ---")
     
     # 1. Initialize Components
