@@ -127,6 +127,7 @@ class RAGEngine:
             "output_tokens": result.get("output_tokens", 0),
             "total_tokens": result.get("total_tokens", 0),
             "tokens_per_second": result.get("tokens_per_second", 0),
+            "answer": result["answer"],      
             **vram
         }
 
@@ -143,9 +144,15 @@ class RAGEngine:
             if vram:
                 print(f"   Peak VRAM        : {vram['peak_vram_mb']} MB")
             
+        if verbose:
             print(f"\n📝 ANSWER:\n{result['answer']}\n")
             print("-" * 80)
 
+        # Always attach these for UI + future use
+        metrics["answer"] = result["answer"]
+        metrics["retrieved_nodes"] = retrieved_nodes
+
         return metrics
+
     
 

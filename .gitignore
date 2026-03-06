@@ -215,4 +215,6 @@ data/qdrant_storage/
 *.pyo
 *.pyd
 technical.md
+evaluation_results.csv
+
 

@@ -1,7 +1,7 @@
-# Vantage Core-RAG
+# VantageCoreRAG
 
-**High-Performance • Resource-Optimized • Indic-Ready**  
-*Bi-Encoder + Cross-Encoder Two-Stage RAG Engine for Consumer Hardware*
+**Resource-Optimized • Local-First  • Indic-Ready**  
+*Bi-Encoder + Cross-Encoder Two-Stage RAG Engine for Consumer Hardware (4GB VRAM)*
 
 ![Python](https://img.shields.io/badge/Python-3.10+-blue)
 ![GPU](https://img.shields.io/badge/GPU-4GB_VRAM-green)
@@ -12,27 +12,28 @@
 
 ### Why Vantage Core-RAG?
 
-A clean, production-grade Retrieval-Augmented Generation system designed to run **efficiently on modest hardware** (4GB VRAM + 5.6GB RAM) while delivering **industrial-grade retrieval quality**.
+A clean, low-resource Retrieval-Augmented Generation system engineered to run **efficiently on modest consumer hardware** (4GB VRAM + 5.6GB RAM) while delivering **high-quality retrieval**.
 
 It uses a **true two-stage architecture**:
-1. **Fast Semantic Search** (BGE-Small)
+1. **Fast Hybrid Search** (BGE-Small + sparse)
 2. **Neural Re-ranking** (BGE-Reranker-Base)
 
-This eliminates semantic noise and gives the LLM only the most relevant context — resulting in more accurate and grounded answers.
+This combination dramatically reduces semantic noise and feeds the LLM only the most relevant context — resulting in more accurate and grounded answers.
 
 ---
 
 ### ✨ Key Features
 
-- Two-stage retrieval (Bi-Encoder + Cross-Encoder) for superior relevance
-- Full GPU acceleration (embedding + reranking)
-- Local Qdrant vector database (persistent & hybrid search ready)
-- Indic text normalization (Devanagari handling)
-- Comprehensive performance metrics & evaluation suite
-- Centralized configuration + clean architecture
-- Fully Docker-ready
-- Extremely low memory footprint
+### Key Features
 
+- **Two-stage retrieval** (Bi-Encoder + Cross-Encoder) for superior relevance on Indic economic documents
+- **Full GPU acceleration** for both embedding and reranking (optimized for 4 GB VRAM)
+- **Local persistent Qdrant** vector store with hybrid search enabled
+- **Native Indic text support** via Devanagari normalization
+- **Comprehensive evaluation suite** with full latency breakdown, token usage, VRAM tracking, and P95 metrics
+- **Clean, centralized architecture** with single configuration and zero model duplication
+- **Production-ready Docker support**
+- **Extremely low resource footprint** — runs comfortably on 5.6 GB RAM + 4 GB VRAM
 ---
 
 ### 🛠 Tech Stack
@@ -42,7 +43,6 @@ This eliminates semantic noise and gives the LLM only the most relevant context 
 - **Vector Store**: Qdrant (local)
 - **LLM**: Groq (llama-3.1-8b-instant)
 - **Framework**: LlamaIndex + Sentence-Transformers
-- **UI/CLI**: Streamlit-ready + CLI
 
 ---
 
