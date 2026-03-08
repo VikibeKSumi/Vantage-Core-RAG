@@ -5,6 +5,7 @@ from dotenv import load_dotenv
 import torch
 from llama_index.core import VectorStoreIndex
 from llama_index.embeddings.huggingface import HuggingFaceEmbedding
+from llama_index.llms.groq import Groq
 
 from .database import VectorDBManager
 from .ai_core import AICore
@@ -13,6 +14,8 @@ from .generation import Generator
 from .config import Config   
 from .logger import logger
 from .cache import SemanticCache
+from .compressor import ContextCompressor
+
 
 class RAGEngine:
     """Central engine — loads everything ONCE, shares embedding model."""
@@ -65,6 +68,11 @@ class RAGEngine:
             # Semantic Cache (added for production speed)
             self.cache = SemanticCache(similarity_threshold=0.85)
             logger.info("   • Semantic Cache initialized")
+            
+            # Context Compressor
+            self.compressor = ContextCompressor()
+            logger.info("   • Context Compressor initialized")
+
             logger.success("✅ Engine is READY!")
 
         except Exception as e:
@@ -72,6 +80,27 @@ class RAGEngine:
             raise RuntimeError("Engine failed to initialize. Check logs/vantage_core.log") from e
 
 
+    def rewrite_query(self, query: str) -> str:
+        """HyDE-style query rewriting for better retrieval."""
+        try:
+            rewrite_prompt = f"""
+            You are an expert at rewriting questions for better retrieval.
+            Rewrite this question to be more precise and detailed for vector search.
+            Keep the original meaning. Return ONLY the rewritten question.
+
+            Original: {query}
+
+            Rewritten question:
+            """
+
+            response = self.generator.llm.complete(rewrite_prompt)
+            rewritten = response.text.strip()
+            logger.info(f"Original: {query} → Rewritten: {rewritten}")
+            return rewritten
+        except:
+            logger.warning("Query rewrite failed, using original")
+            return query
+        
     def ask(self, query: str, verbose: bool = True):
         """Main query flow with detailed metrics: time + GPU VRAM usage."""
         import time
@@ -98,9 +127,14 @@ class RAGEngine:
             if verbose:
                 logger.info(f"\n🔍 Query received: {query}")
 
-            # 1. Retrieval + Rerank
+            # HyDE Query Rewriting (improves retrieval quality)
+            rewritten_query = self.rewrite_query(query)
+            if verbose and rewritten_query != query:
+                logger.info(f"→ Rewritten query: {rewritten_query}")
+                
+            # 1. Retrieval + Rerank (use rewritten query)
             t0 = time.time()
-            retrieved_nodes = self.searcher.retrieve_and_rerank(query, self.index)
+            retrieved_nodes = self.searcher.retrieve_and_rerank(rewritten_query, self.index)
             retrieval_time = time.time() - t0
 
             if not retrieved_nodes:
@@ -122,12 +156,15 @@ class RAGEngine:
             if verbose:
                 logger.info(f"✅ Top match (score: {top.score:.4f}) | Avg Score: {avg_rerank_score:.4f} | Source: {top.node.metadata.get('file_name', 'Unknown')}")
 
-            # 2. Generation
+            # 2. Context Compression (reduces tokens sent to Groq)
+            compressed_nodes = self.compressor.compress(retrieved_nodes, max_tokens=1500)
+        
+            # 3. Generation
             t1 = time.time()
             if verbose:
-                logger.info("Generating response with Groq..")
+                logger.info(f"Generating response... (compressed from {len(retrieved_nodes)} to {len(compressed_nodes)} nodes)")
             
-            result = self.generator.generate_response(query, retrieved_nodes)
+            result = self.generator.generate_response(query, compressed_nodes)
             
             
             gen_time = time.time() - t1
@@ -186,7 +223,7 @@ class RAGEngine:
 
             # Store successful response in Semantic Cache for future queries
             self.cache.store(query, result["answer"], metrics)
-
+            
             return metrics
         
         except Exception as e:

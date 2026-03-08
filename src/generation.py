@@ -2,6 +2,8 @@
 from llama_index.llms.groq import Groq
 from llama_index.core.schema import MetadataMode
 
+from tenacity import retry, stop_after_attempt, wait_exponential, retry_if_exception_type
+from groq import RateLimitError, APIConnectionError
 
 
 class Generator:
@@ -16,6 +18,13 @@ class Generator:
             model=config.models["llm"],
             api_key=config.api_key
         )
+
+    @retry(
+        stop=stop_after_attempt(3),
+        wait=wait_exponential(multiplier=1, min=2, max=10),
+        retry=retry_if_exception_type((RateLimitError, APIConnectionError)),
+        reraise=True
+    )
 
     def generate_response(self, query: str, context_nodes: list):
         """Returns answer + full token metrics (final version)."""
@@ -34,14 +43,12 @@ class Generator:
         response = self.llm.complete(prompt)
 
         # Extract token usage from Groq (LlamaIndex 2026 format)
-        usage = response.raw.usage if hasattr(response, 'raw') and hasattr(response.raw, 'usage') else None
+        usage = getattr(response.raw, 'usage', None) if hasattr(response, 'raw') else None
         input_tokens = usage.prompt_tokens if usage else len(prompt.split())
         output_tokens = usage.completion_tokens if usage else len(response.text.split())
 
         # Reliable TPS calculation (fixed for LlamaIndex + Groq 2026)
-        gen_time = 1.0
-        tps = round(output_tokens / gen_time, 2) if gen_time > 0 and output_tokens > 0 else 0.0
-
+        tps = output_tokens / getattr(response, 'response_time', 1)
         return {
             "answer": response.text,
             "input_tokens": input_tokens,

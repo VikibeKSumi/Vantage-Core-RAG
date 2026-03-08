@@ -1,7 +1,7 @@
 # VantageCoreRAG
 
-**Resource-Optimized • Local-First  • Indic-Ready**  
-*Bi-Encoder + Cross-Encoder Two-Stage RAG Engine for Consumer Hardware (4GB VRAM)*
+**Production-Grade Low-Resource Local RAG System**  
+*Optimized for Consumer Hardware (4GB VRAM + 5.6GB RAM)*
 
 ![Python](https://img.shields.io/badge/Python-3.10+-blue)
 ![GPU](https://img.shields.io/badge/GPU-4GB_VRAM-green)
@@ -14,30 +14,25 @@
 
 A clean, low-resource Retrieval-Augmented Generation system engineered to run **efficiently on modest consumer hardware** (4GB VRAM + 5.6GB RAM) while delivering **high-quality retrieval**.
 
-It uses a **true two-stage architecture**:
-1. **Fast Hybrid Search** (BGE-Small + sparse)
-2. **Neural Re-ranking** (BGE-Reranker-Base)
-
-This combination dramatically reduces semantic noise and feeds the LLM only the most relevant context — resulting in more accurate and grounded answers.
-
 ---
 
 ### ✨ Key Features
 
-### Key Features
-
 - **Two-stage retrieval** (Bi-Encoder + Cross-Encoder) for superior relevance on Indic economic documents
 - **Semantic Cache** – Instant responses for similar/repeated queries (major latency win)
+- **Query Rewriting (HyDE)**: Improves retrieval quality by rewriting user questions
+- **Context Compression**: Reduces tokens sent to Groq (faster & cheaper generation)
 - **Full GPU acceleration** for both embedding and reranking (optimized for 4 GB VRAM)
 - **Local persistent Qdrant** vector store with hybrid search enabled
 - **Native Indic text support** via Devanagari normalization
-- **Comprehensive evaluation suite** with full latency breakdown, token usage, VRAM tracking, and P95 metrics
+- **Production Observability**: FastAPI `/health` + Prometheus-compatible `/metrics` endpoint
 - **Structured Logging** with Loguru (console + file)
-- **Production Observability** – FastAPI `/health` and Prometheus-compatible `/metrics` endpoint
-- **Robust error handling** & graceful degradation
+- **Automatic Retries & Rate Limiting**: Graceful handling of Groq API limits
+- **Comprehensive evaluation suite** with full latency breakdown, token usage, VRAM tracking, and P95 metrics
 - **Clean, centralized architecture** with single configuration and zero model duplication
 - **Streamlit UI** with live metrics display
 - **Production-ready Docker support** (Dockerfile + docker-compose ready)
+- **Robust error handling** & graceful degradation
 - **Extremely low resource footprint** — runs comfortably on 5.6 GB RAM + 4 GB VRAM
 
 ---
@@ -50,17 +45,20 @@ This combination dramatically reduces semantic noise and feeds the LLM only the 
 - **LLM**: Groq (llama-3.1-8b-instant)
 - **Framework**: LlamaIndex + Sentence-Transformers
 - **Observability**: FastAPI + Loguru
-- **Cache**: In-memory Semantic Cache
 - **UI**: Streamlit
 
 ---
 
-### 📈 Current Performance (on 4GB VRAM + 5.6GB RAM)
-(data set used is economic survey of India 26-27 and Union Budget FYI27 )
-- Average Latency: ~21 seconds
-- Retrieval + Rerank: 0.59s
-- Peak VRAM: 1.26 GB
-- Empty Retrieval Rate: 0%
+### 📈 Current Performance (Batch Process)
+**Under consumer hardware constraints (4GB VRAM + 5.6GB RAM) and Groq API:**
+
+- Average Total Latency: **19.67 seconds**
+- Retrieval + Rerank: **0.59 seconds**
+- Peak VRAM: **1.18 GB**
+- Empty Retrieval Rate: **0.0%**
+- Avg Tokens per Query: **2362**
+
+*Note: Latency is dominated by Groq generation. Hybrid local LLM fallback is planned for <12s average.*
 
 ---
 
@@ -71,7 +69,7 @@ This combination dramatically reduces semantic noise and feeds the LLM only the 
     git clone https://github.com/yourusername/vantage_core_rag.git
     cd vantage_core_rag
 ```
-# 2. Create and activate environment
+# 2. (optional but recommended) Create and activate environment
 ```bash
     conda create -n vantage python=3.10 -y
     conda activate vantage
@@ -99,7 +97,7 @@ This combination dramatically reduces semantic noise and feeds the LLM only the 
     python ingestion.py
 ```
 
-# 7. Run the RAG Engine
+# 7. (Main) Run the RAG Engine
 ```bash
     python run.py
 ```
@@ -118,46 +116,41 @@ Type your questions in the terminal after running python run.py. Type 'exit' to 
 ```
     python api.py
 ```
+
 ---
 
 ### 📁 Folder Structure
 
 ```text
 vantage_core_rag/
-├── run.py                    # Main CLI
-├── ingestion.py              # Ingest documents
-├── run_eval.py               # Full evaluation
+├── run.py                    # Main CLI entry point
+├── app.py                    # Streamlit UI
+├── api.py                    # Observability API
+├── ingestion.py              # Document ingestion
+├── run_eval.py               # Full benchmarking
+├── docker-compose.yml
 ├── src/
-│   ├── engine_load.py        # Core engine (loads once)
+│   ├── engine_load.py        # Core orchestration engine
 │   ├── retrieve_and_rerank.py
+│   ├── cache.py              # Semantic Cache
+│   ├── compressor.py         # Context Compression
+│   ├── logger.py
 │   ├── config.py
 │   └── ...
 ├── config/settings.yaml
-├── data/raw_docs/            # ← Put your PDFs here
-└── evaluation_results.csv
+└── data/raw_docs/
 ```
 
 ---
 
 ### 🚧 Next Priorities (High Impact)
-
-- **Query Rewriting / HyDE** – Improve retrieval quality and rerank scores
-- **Contextual Compression** – Reduce tokens sent to Groq for faster & cheaper generation
-- **Rate Limiting + Retry Logic** – Better handling of Groq API limits
-- **Persistent Semantic Cache** – Save cache to disk (survives restarts)
-- **Docker optimization** – Multi-stage build for much smaller image size
-
-### Future Enhancements
-
-- Faithfulness evaluation (LLM-as-Judge)
-- Advanced monitoring dashboard (Prometheus + Grafana)
-- Hybrid fallback (local small model when Groq is slow)
-- Multi-user support & authentication
+- Persistent Semantic Cache (disk-backed)
+- Qdrant Server mode (true multi-service support)
+- Advanced faithfulness evaluation
+- Smaller Docker image (multi-stage build)
 
 ---
 
-### 🙏 Acknowledgments
-- Assisted and Informed greatly by Grok (xAI)
-- Pytorch
-- LLamaIndex
+### Built With
+Assisted and guided by Grok (xAI) • LlamaIndex • Sentence-Transformers • Qdrant • Groq
 
