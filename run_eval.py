@@ -8,7 +8,7 @@ from tabulate import tabulate
 sys.path.insert(0, str(Path(__file__).parent / "src"))
 
 from src.engine_load import RAGEngine
-
+from src.logger import logger
 
 def main():
     print("🚀 Running Full Vantage Core RAG Evaluation...\n")
@@ -34,7 +34,7 @@ def main():
 
     results = []
     empty_count = 0
-    print(f"Testing {len(test_queries)} diverse queries (silent mode)...\n")
+    logger.info(f"Starting evaluation with {len(test_queries)} test queries (silent mode)")
 
     for i, query in enumerate(test_queries, 1):
         print(f"[{i:2d}/{len(test_queries)}] Running: {query[:70]}...")

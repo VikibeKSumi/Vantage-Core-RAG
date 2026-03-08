@@ -9,41 +9,33 @@ ENV PYTHONUNBUFFERED=1 \
 
 WORKDIR /app
 
-# System dependencies (fixed using update-alternatives — no symlink conflict)
+# System dependencies
 RUN apt-get update && apt-get install -y \
-    python3.10 \
-    python3-pip \
-    python3.10-dev \
-    build-essential \
-    git \
-    curl \
+    python3.10 python3-pip python3.10-dev \
+    build-essential git curl \
     && rm -rf /var/lib/apt/lists/* \
     && update-alternatives --install /usr/bin/python python /usr/bin/python3.10 1 \
     && update-alternatives --install /usr/bin/pip pip /usr/bin/pip3 1
 
-# Upgrade pip
 RUN pip install --no-cache-dir --upgrade pip
 
-# Copy requirements first (better layer caching)
+# Copy requirements first (better Docker caching)
 COPY requirements.txt .
-
-# Install PyTorch with CUDA (critical for performance)
 RUN pip install --no-cache-dir --default-timeout=1000 torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu124
-
-# Install rest of dependencies
 RUN pip install --no-cache-dir -r requirements.txt
 
 # Copy project
 COPY . .
 
-# Create persistent directories
-RUN mkdir -p data/qdrant_storage config
+# Create necessary directories
+RUN mkdir -p logs data/qdrant_storage
 
-# Make scripts executable
-RUN chmod +x run.py ingestion.py run_eval.py
+# Expose ports for Streamlit + Observability API
+EXPOSE 8501 8000
 
-# Expose Streamlit port (for future app.py)
-EXPOSE 8501
+# Healthcheck (very important for production)
+HEALTHCHECK --interval=30s --timeout=10s --start-period=10s --retries=3 \
+    CMD curl -f http://localhost:8501/healthz || exit 1
 
-# Default command (CLI engine)
-CMD ["python", "run.py"]
+# Default command (can be overridden by docker-compose)
+CMD ["streamlit", "run", "app.py", "--server.port=8501", "--server.address=0.0.0.0"]
