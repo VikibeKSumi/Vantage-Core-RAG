@@ -1,7 +1,7 @@
 # VantageCoreRAG
 
-**Production-Ready Local RAG System**  
-*Optimized for Consumer Hardware (4GB VRAM + 5.6GB RAM)*
+**Optimized Low-Resource Structured Bi-Encoder + Cross-Encoder RAG Pipeline **  
+*For Consumer Hardware (4GB VRAM + 5.6GB RAM)*
 
 ![Python](https://img.shields.io/badge/Python-3.10+-blue)
 ![GPU](https://img.shields.io/badge/GPU-4GB_VRAM-green)
