@@ -1,6 +1,6 @@
 # VantageCoreRAG
 
-**Production-Grade Low-Resource Local RAG System**  
+**Production-Ready Local RAG System**  
 *Optimized for Consumer Hardware (4GB VRAM + 5.6GB RAM)*
 
 ![Python](https://img.shields.io/badge/Python-3.10+-blue)
@@ -144,10 +144,12 @@ vantage_core_rag/
 ---
 
 ### 🚧 Next Priorities (High Impact)
+- Hybrid local LLM fallback (biggest latency win)
+- Advanced Reranker
 - Persistent Semantic Cache (disk-backed)
 - Qdrant Server mode (true multi-service support)
 - Advanced faithfulness evaluation
-- Smaller Docker image (multi-stage build)
+- Observability Dashboard
 
 ---
 
