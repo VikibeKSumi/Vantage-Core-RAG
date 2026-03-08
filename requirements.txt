@@ -17,3 +17,8 @@ python-dotenv
 streamlit>=1.32.0
 pandas
 tabulate
+
+# Observability (for production-grade monitoring)
+fastapi
+uvicorn[standard]
+loguru>=0.7.0
