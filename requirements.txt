@@ -22,3 +22,6 @@ tabulate
 fastapi
 uvicorn[standard]
 loguru>=0.7.0
+
+tenacity>=8.5.0
+groq

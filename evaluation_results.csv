@@ -1,15 +1,15 @@
 Query,Total_Latency_s,Retrieval_s,Generation_s,Top_Rerank_Score,Avg_Rerank_Score,Docs_Retrieved,Input_Tokens,Output_Tokens,Total_Tokens,Tokens_per_Second,Peak_VRAM_MB,Empty_Retrieval
-What is the fiscal deficit target for 2026-27?,9.96,7.22,2.74,0.385,0.1341,4,2395,91,2486,91.0,1266.2,No
-Summarize the key highlights of Economic Survey 2025-26...,1.41,0.46,0.95,0.9979,0.8075,4,2309,375,2684,375.0,1266.2,No
-What are the major allocations in Budget at a Glance 20...,5.1,0.28,4.83,0.2591,0.185,4,1356,285,1641,285.0,1266.2,No
-How much is allocated to defence?,18.59,0.56,18.03,0.0032,0.0013,4,1701,277,1978,277.0,1266.2,No
-What is the projected GDP growth for FY 2026-27?,22.65,0.6,22.05,0.9377,0.4593,4,2154,61,2215,61.0,1266.2,No
-Explain revenue and capital receipts in the budget.,27.48,0.6,26.89,0.2721,0.1532,4,2559,485,3044,485.0,1266.2,No
-What are the major agriculture schemes announced?,26.24,0.55,25.69,0.0445,0.0237,4,2283,485,2768,485.0,1266.2,No
-What is the total expenditure for 2026-27?,15.3,0.5,14.8,0.9987,0.6673,4,1446,48,1494,48.0,1266.2,No
-How does the budget address inflation?,25.41,0.48,24.93,0.3909,0.0988,4,2472,125,2597,125.0,1266.2,No
-Key recommendations of Economic Survey on employment?,28.96,0.5,28.46,0.5275,0.1432,4,2682,397,3079,397.0,1266.2,No
-Compare capital expenditure this year vs last year.,31.77,0.56,31.2,0.0455,0.0225,4,3033,148,3181,148.0,1266.2,No
-What is the tax-to-GDP ratio target?,33.12,1.04,32.08,0.0277,0.0104,4,3177,17,3194,17.0,1266.2,No
-Any new green energy initiatives?,31.16,0.92,30.24,0.0982,0.0263,4,3107,309,3416,309.0,1266.2,No
-What is the fiscal deficit as % of GDP?,25.8,1.02,24.78,0.7211,0.3385,4,2497,27,2524,27.0,1266.2,No
+What is the fiscal deficit target for 2026-27?,4.69,1.65,0.44,0.99,0.5372,4,2942,56,2998,56.0,1266.2,No
+Summarize the key highlights of Economic Survey 2025-26...,1.75,0.62,0.55,0.9996,0.5394,4,2200,186,2386,186.0,1266.2,No
+What are the major allocations in Budget at a Glance 20...,10.84,0.31,10.25,0.64,0.3049,4,1966,384,2350,384.0,1266.2,No
+How much is allocated to defence?,25.84,0.54,23.91,0.2081,0.0926,4,2352,144,2496,144.0,1266.2,No
+What is the projected GDP growth for FY 2026-27?,27.83,0.49,25.94,0.6132,0.2197,4,2527,62,2589,62.0,1266.2,No
+Explain revenue and capital receipts in the budget.,27.19,0.55,26.34,0.5466,0.1925,4,2559,404,2963,404.0,1266.2,No
+What are the major agriculture schemes announced?,25.34,0.61,23.3,0.1379,0.0456,4,2242,409,2651,409.0,1266.2,No
+What is the total expenditure for 2026-27?,0.0,0.0,0.0,0.0,0.0,0,0,0,0,0.0,0.0,No
+How does the budget address inflation?,23.95,0.59,21.93,0.0446,0.031,4,2165,98,2263,98.0,1266.2,No
+Key recommendations of Economic Survey on employment?,20.14,0.64,18.08,0.106,0.0369,4,1747,282,2029,282.0,1266.2,No
+Compare capital expenditure this year vs last year.,26.96,0.62,24.86,0.4656,0.124,4,2500,64,2564,64.0,1266.2,No
+What is the tax-to-GDP ratio target?,27.8,0.5,25.87,0.0067,0.0038,4,2581,51,2632,51.0,1266.2,No
+Any new green energy initiatives?,21.15,0.52,19.22,0.0207,0.0136,4,1902,220,2122,220.0,1266.2,No
+What is the fiscal deficit as % of GDP?,31.93,0.58,29.99,0.4539,0.2747,4,2988,35,3023,35.0,1266.2,No
