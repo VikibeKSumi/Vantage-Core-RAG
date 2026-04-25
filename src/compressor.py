@@ -1,4 +1,3 @@
-# src/compressor.py — Context Compression (production-ready)
 from llama_index.core.postprocessor import LongContextReorder
 from llama_index.core.schema import NodeWithScore
 

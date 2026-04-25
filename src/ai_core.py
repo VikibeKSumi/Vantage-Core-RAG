@@ -14,7 +14,6 @@ class AICore:
         
         self.normalizer = DevanagariNormalizer()
 
-
         
     def preprocess_indic_text(self, text: str) -> str:
         return self.normalizer.normalize(text)

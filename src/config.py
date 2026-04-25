@@ -1,4 +1,3 @@
-# src/config.py
 import yaml
 from pathlib import Path
 from typing import Any, Dict
@@ -18,7 +17,6 @@ class Config:
 
         self._validate()
 
-        # Centralize Groq API key (no more passing separately)
         load_dotenv()
         self.api_key = os.getenv("GROQ_API_KEY")
         if not self.api_key:
@@ -46,3 +44,7 @@ class Config:
     @property
     def ingestion(self) -> Dict:
         return self.data["ingestion"]
+    
+    @property
+    def device(self) -> Dict:
+        return self.data["device"]

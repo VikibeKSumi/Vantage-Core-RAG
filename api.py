@@ -17,7 +17,7 @@ async def health():
 
 @app.get("/metrics")
 async def metrics():
-    """Prometheus-compatible metrics (resume-friendly)"""
+    """Prometheus-compatible metrics"""
     return PlainTextResponse(f"""# HELP vantage_rag_info Vantage Core RAG status
         # TYPE vantage_rag_info gauge
         vantage_rag_info{{status="running",version="1.0"}} 1
