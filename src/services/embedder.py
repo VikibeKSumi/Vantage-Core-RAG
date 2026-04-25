@@ -3,12 +3,12 @@ from typing import List
 
 
 class Embedder():
-    def __init__(self, bi_encoder: HuggingFaceEmbedding):
-        self.bi_encoder = bi_encoder
+    def __init__(self, embedding_model: HuggingFaceEmbedding):
+        self.embedding_model = embedding_model
     
     def encode(self, query: List[str]):
         
-        return self.bi_encoder.get_text_embedding_batch(
+        return self.embedding_model.get_text_embedding_batch(
             query,
         )
         
