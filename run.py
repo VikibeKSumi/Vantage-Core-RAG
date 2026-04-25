@@ -1,12 +1,7 @@
-from src.engine_load import RAGEngine
+from src.engine import Engine
 
 if __name__ == "__main__":
     
-    engine = RAGEngine()
-    exit_cmd = ['exit', 'quit']
-    while True:
-        query = input("Enter query (type 'exit' or 'quit' end): ").strip()
-        if query.lower() in exit_cmd:
-            print("👋 Goodbye!")
-            break
-        engine.ask(query, verbose=False)
+    engine = Engine()
+    query = "The test query is working"
+    engine.run(query)
