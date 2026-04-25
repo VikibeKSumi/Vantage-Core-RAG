@@ -96,5 +96,6 @@ class Engine():
 
         print("-------OUTPUT--------")
         print(result)
+        return result
 
         

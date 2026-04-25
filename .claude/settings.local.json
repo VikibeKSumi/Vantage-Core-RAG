@@ -1,0 +1,7 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(del \"c:\\\\Users\\\\vikib\\\\Documents\\\\ai_projects\\\\vantage_core_rag\\\\src\\\\ai_core.py\" \"c:\\\\Users\\\\vikib\\\\Documents\\\\ai_projects\\\\vantage_core_rag\\\\src\\\\cache.py\" \"c:\\\\Users\\\\vikib\\\\Documents\\\\ai_projects\\\\vantage_core_rag\\\\src\\\\compressor.py\" \"c:\\\\Users\\\\vikib\\\\Documents\\\\ai_projects\\\\vantage_core_rag\\\\src\\\\database.py\" \"c:\\\\Users\\\\vikib\\\\Documents\\\\ai_projects\\\\vantage_core_rag\\\\src\\\\engine_load.py\" \"c:\\\\Users\\\\vikib\\\\Documents\\\\ai_projects\\\\vantage_core_rag\\\\src\\\\generation.py\" \"c:\\\\Users\\\\vikib\\\\Documents\\\\ai_projects\\\\vantage_core_rag\\\\src\\\\retrieve_and_rerank.py\")"
+    ]
+  }
+}
