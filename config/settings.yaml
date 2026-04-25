@@ -1,6 +1,6 @@
 # Vantage Core RAG Configuration
 
-project_name: "vantage_core_RAG"
+project_name: "XXX"
 models:
   llm: "llama-3.3-70b-versatile" 
   embedding: "BAAI/bge-small-en-v1.5"
@@ -8,13 +8,6 @@ models:
 
 database:
   type: "qdrant"
-  path: "./data/qdrant_storage"
-  collection_name: "fiscal_budget_corpus"
-
-ingestion:
-  chunk_size: 1024
-  overlap: 20
-  
-device:
-  device: 'cuda'
-  
+  raw_data_path: "./data/raw_docs"
+  db_path: "./data/qdrant_storage"
+  collection_name: "economy_FY27"

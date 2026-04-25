@@ -4,7 +4,6 @@ from ..services.reranker import Reranker
 from ..core.text_utils import TextUtils
 
 class Retriever:
-    """Two-stage retriever: fast vector search + cross-encoder reranking."""
 
     def __init__(self, text_utils: TextUtils, reranker: Reranker):
         self.text_utils = text_utils

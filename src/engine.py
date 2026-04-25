@@ -1,6 +1,7 @@
 
 import os
 import torch
+from pathlib import Path
 
 from llama_index.core import VectorStoreIndex
 from llama_index.embeddings.huggingface import HuggingFaceEmbedding
@@ -30,7 +31,7 @@ class Engine():
         self.embedding_model_name = self.config.models.get("embedding")
         self.reranker_model_name = self.config.models.get("reranker")
         self.device = "cuda" if torch.cuda.is_available() else "cpu"
-        self.db_path = self.config.database.get('db_path')
+        self.db_path = str(Path(self.config.database.get('db_path')))
         self.db_collection_name = self.config.database.get("collection_name")
         self.llm_model = self.config.models.get("llm")
         self.api_key = os.getenv("GROQ_API_KEY")

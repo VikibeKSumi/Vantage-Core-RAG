@@ -13,10 +13,8 @@ class VectorDBManager:
 
     def __init__(self, config):
         """Accepts Config object or raw dict (for compatibility)."""
-        if hasattr(config, 'data'):   # it's our Config class
-            self.config = config.data
-        else:
-            self.config = config
+
+        self.config = config
 
         self.client = qdrant_client.QdrantClient(
             path=self.config['database']['path']

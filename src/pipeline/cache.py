@@ -1,16 +1,14 @@
 import torch
 from typing import Dict, Optional
 import time
-from ..services.embedder import Embedder
-
 
 class SemanticCache:
     """Semantic cache using vector similarity. Stores query → answer + metrics."""
 
-    def __init__(self, embedder: Embedder, similarity_threshold: float = 0.85):
+    def __init__(self, embedder, similarity_threshold: float = 0.85):
         self.embedder = embedder  
-        self.cache: Dict[str, dict] = {}
         self.threshold = similarity_threshold
+        self.cache: Dict[str, dict] = {}
 
 
     def get(self, query: str) -> Optional[dict]:
