@@ -4,58 +4,70 @@ from pathlib import Path
 # Add src to Python path so we can import our package
 sys.path.insert(0, str(Path(__file__).parent / "src"))
 
-from src.config import Config
-from llama_index.core import SimpleDirectoryReader, VectorStoreIndex
-from llama_index.core.node_parser import SentenceSplitter
+import torch
+
+from src.config.config import config
+from src.services.vector_store import VectorDBManager
+
+from llama_index.core import Settings, SimpleDirectoryReader, VectorStoreIndex
+from llama_index.core.node_parser import SemanticSplitterNodeParser
 from llama_index.embeddings.huggingface import HuggingFaceEmbedding
 
-from src.database import VectorDBManager
+
+from pathlib import Path
+from loguru import logger
 
 
-def main():
-    print("🚀 Starting Ingestion Pipeline...")
+def ingestion():
+    logger.info(f".........Starting Ingestion Pipeline.........")
+    raw_data_path = str(Path(config.database.get("raw_data_path")))
+    db_path = str(Path(config.database.get("db_path")))
+    collection_name = config.database.get("collection_name")
+    embed_model_name = config.models.get("embedding")
+    device = "cuda" if torch.cuda.is_available() else "cpu"
 
-    config = Config()
+    Settings.embed_model = HuggingFaceEmbedding(
+        model_name=embed_model_name,
+        device=device
+    )
 
     # 1. Load raw documents
-    print("   • Loading documents from ./data/raw_docs")
+    logger.info(f"Loading documents....")
     reader = SimpleDirectoryReader(
-        input_dir="./data/raw_docs",
+        input_dir=str(raw_data_path),
         recursive=True
     )
     
     documents = reader.load_data()
-    print(f"   Loaded {len(documents)} document pages.")
+    logger.info(f"loaded {len(documents)} document pages")
 
     # 2. Chunking
-    parser = SentenceSplitter(
-        chunk_size=config.ingestion["chunk_size"],
-        chunk_overlap=config.ingestion["overlap"]
+    splitter = SemanticSplitterNodeParser(
+        buffer_size=1,
+        breakpoint_percentile_threshold=95,
+        embed_model=Settings.embed_model
     )
-    nodes = parser.get_nodes_from_documents(documents)
-    print(f"   Created {len(nodes)} chunks.")
+    nodes = splitter.get_nodes_from_documents(documents)
+    logger.info(f"created {len(nodes)} chunks....")
 
     # 3. Database + Index
-    print("   • Connecting to Qdrant...")
-    db_manager = VectorDBManager(config)        # pass raw dict for now (same as engine)
-
-    print("   • Loading embedding model...")
-    embed_model = HuggingFaceEmbedding(
-        model_name=config.models["embedding"],
-        device=config.device['device']
-    )
+    logger.info("connecting to Qdrant...")
+    db_manager = VectorDBManager(
+        db_path=db_path,
+        collection_name=collection_name
+    )      
 
     storage_context = db_manager.get_storage_context()
 
-    print("   • Building vector index...")
+    logger.info("building vector index....")
     _ = VectorStoreIndex(
         nodes=nodes,
         storage_context=storage_context,
-        embed_model=embed_model
+        embed_model=Settings.embed_model
     )
 
-    print("✅ Ingestion completed successfully!")
+    logger.info(".......Ingestion Successful!!.......")
 
 
 if __name__ == "__main__":
-    main()
+    ingestion()

@@ -3,15 +3,13 @@ from llama_index.core.schema import MetadataMode
 
 from tenacity import retry, stop_after_attempt, wait_exponential, retry_if_exception_type
 from groq import RateLimitError, APIConnectionError
-from ..config import Config
 
 class LLMService:
 
-    def __init__(self, config: Config):
-     
+    def __init__(self, llm_model: str, api_key: str):
         self.llm = Groq(
-            model=config.models["llm"],
-            api_key=config.api_key
+            model=llm_model,
+            api_key=api_key
         )
 
     @retry(
@@ -20,7 +18,6 @@ class LLMService:
         retry=retry_if_exception_type((RateLimitError, APIConnectionError)),
         reraise=True
     )
-
     def generate_response(self, query: str, context_nodes: list):
         """Returns answer + full token metrics (final version)."""
         context_text = "\n\n".join([
