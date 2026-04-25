@@ -1,25 +1,20 @@
-# =============================================================================
 # Vantage Core RAG Configuration
-# =============================================================================
-# API keys (GROQ, etc.) go in .env file — never here
-# All other settings stay in this file
-
 
 project_name: "vantage_core_RAG"
 models:
-  llm: "llama-3.1-8b-instant" # High intelligence, low latency
-  embedding: "BAAI/bge-small-en-v1.5" # Very lightweight
-  reranker: "BAAI/bge-reranker-base"   # Downsized from 'v2-m3'
+  llm: "llama-3.3-70b-versatile" 
+  embedding: "BAAI/bge-small-en-v1.5"
+  reranker: "BAAI/bge-reranker-base"  
 
 database:
   type: "qdrant"
-  path: "./data/qdrant_storage" # Local storage for dev
-  collection_name: "indic_corpus"
+  path: "./data/qdrant_storage"
+  collection_name: "fiscal_budget_corpus"
 
 ingestion:
   chunk_size: 1024
   overlap: 20
-
+  
 device:
   device: 'cuda'
   

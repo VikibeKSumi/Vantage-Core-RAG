@@ -1,4 +1,3 @@
-# src/cache.py — Semantic Cache (production-ready)
 from sentence_transformers import SentenceTransformer
 import torch
 from typing import Dict, Optional, Tuple
@@ -7,14 +6,17 @@ import time
 class SemanticCache:
     """Semantic cache using vector similarity. Stores query → answer + metrics."""
 
-    def __init__(self, similarity_threshold: float = 0.85):
+    def __init__(self, config, similarity_threshold: float = 0.85):
         self.cache: Dict[str, dict] = {}           # query_text -> cached data
         self.threshold = similarity_threshold
         self.embedder = None                       # lazy load to save memory
-
+        self.config = config
+    
     def _get_embedder(self):
+        embed_model= self.config.models['embedding']
+        device = self.config.device['device'] or 'cpu'
         if self.embedder is None:
-            self.embedder = SentenceTransformer("BAAI/bge-small-en-v1.5", device="cpu")
+            self.embedder = SentenceTransformer(model_name_or_path=embed_model, device=device)
         return self.embedder
 
     def get(self, query: str) -> Optional[dict]:

@@ -1,6 +1,6 @@
 # VantageCoreRAG
 
-**Optimized Low-Resource Structured Bi-Encoder + Cross-Encoder RAG Pipeline **  
+**Optimized Low-Resource Bi-Encoder + Cross-Encoder RAG Pipeline **  
 *For Consumer Hardware (4GB VRAM + 5.6GB RAM)*
 
 ![Python](https://img.shields.io/badge/Python-3.10+-blue)
@@ -20,8 +20,8 @@ A clean, low-resource Retrieval-Augmented Generation system engineered to run **
 
 - **Two-stage retrieval** (Bi-Encoder + Cross-Encoder) for superior relevance on Indic economic documents
 - **Semantic Cache** – Instant responses for similar/repeated queries (major latency win)
-- **Query Rewriting (HyDE)**: Improves retrieval quality by rewriting user questions
-- **Context Compression**: Reduces tokens sent to Groq (faster & cheaper generation)
+- **Query Rewriting**: Improves retrieval quality by rewriting user questions
+- **Context Compression**: Reduces tokens sent to Groq (faster & cheaper generation).
 - **Full GPU acceleration** for both embedding and reranking (optimized for 4 GB VRAM)
 - **Local persistent Qdrant** vector store with hybrid search enabled
 - **Native Indic text support** via Devanagari normalization
@@ -39,10 +39,10 @@ A clean, low-resource Retrieval-Augmented Generation system engineered to run **
 
 ### 🛠 Tech Stack
 
-- **Embedding**: `BAAI/bge-small-en-v1.5`
-- **Reranker**: `BAAI/bge-reranker-base`
+- **Embedding**: `BAAI/bge-large-en-v1.5`
+- **Reranker**: `BAAI/bge-reranker-v2-m3`
 - **Vector Store**: Qdrant (local)
-- **LLM**: Groq (llama-3.1-8b-instant)
+- **LLM**: Groq (llama-3.3-70b-versatile)
 - **Framework**: LlamaIndex + Sentence-Transformers
 - **Observability**: FastAPI + Loguru
 - **UI**: Streamlit
@@ -71,8 +71,8 @@ A clean, low-resource Retrieval-Augmented Generation system engineered to run **
 ```
 # 2. (optional but recommended) Create and activate environment
 ```bash
-    conda create -n vantage python=3.10 -y
-    conda activate vantage
+    conda create -n vantage_core_rag python=3.10 -y
+    conda activate vantage_core_rag
 ```
 
 # 3. Install dependencies
@@ -80,14 +80,14 @@ A clean, low-resource Retrieval-Augmented Generation system engineered to run **
     pip install -r requirements.txt
 ```
 
-# 4. Add your Groq API key 
+# 4. Add your Groq API key (Groq Inference Provider Used Here)
 (Create a file named .env in the root folder and put this line inside it)
 ```env
-    GROQ_API_KEY=gsk_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+    GROQ_API_KEY=gsk_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx  <- Replace with your Groq API
 ```
 
 # 5. Put your PDF files
-(Budget, Economic Survey provided inside this folder)
+(Budget, Economic Survey provided as default inside this folder)
 ```text
     data/raw_docs/
 ```
@@ -102,7 +102,7 @@ A clean, low-resource Retrieval-Augmented Generation system engineered to run **
     python run.py
 ```
 
-# 8. (Optional but recommended) Run full evaluation
+# 8. (Optional but recommended) Run full Batch Evaluation
 ```bash
     python run_eval.py
 ```

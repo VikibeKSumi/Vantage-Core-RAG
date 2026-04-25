@@ -1,4 +1,3 @@
-# ingestion.py
 import sys
 from pathlib import Path
 
@@ -24,6 +23,7 @@ def main():
         input_dir="./data/raw_docs",
         recursive=True
     )
+    
     documents = reader.load_data()
     print(f"   Loaded {len(documents)} document pages.")
 
@@ -42,7 +42,7 @@ def main():
     print("   • Loading embedding model...")
     embed_model = HuggingFaceEmbedding(
         model_name=config.models["embedding"],
-        device="cpu"
+        device=config.device['device']
     )
 
     storage_context = db_manager.get_storage_context()

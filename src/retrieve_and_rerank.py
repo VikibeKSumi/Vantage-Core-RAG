@@ -3,7 +3,7 @@ from llama_index.core.schema import NodeWithScore
 
 
 
-class SemanticSearcher:
+class RetrieveAndRerank:
     """Two-stage retriever: fast vector search + cross-encoder reranking."""
 
     def __init__(self, ai_core):

@@ -1,15 +1,14 @@
-# src/engine_load.py
 import os
 from dotenv import load_dotenv
 
+import time
 import torch
 from llama_index.core import VectorStoreIndex
 from llama_index.embeddings.huggingface import HuggingFaceEmbedding
-from llama_index.llms.groq import Groq
 
 from .database import VectorDBManager
 from .ai_core import AICore
-from .retrieve_and_rerank import SemanticSearcher
+from .retrieve_and_rerank import RetrieveAndRerank
 from .generation import Generator
 from .config import Config   
 from .logger import logger
@@ -60,13 +59,13 @@ class RAGEngine:
             # 3. AI Core (receives the shared bi_encoder)
             logger.info("   • Loading reranker + Indic normalizer...")
             self.ai_core = AICore(self.config, bi_encoder=self.bi_encoder, device=self.device)
-            self.searcher = SemanticSearcher(self.ai_core)
+            self.searcher = RetrieveAndRerank(self.ai_core)
 
             # 4. Generator
             self.generator = Generator(config=self.config)
 
             # Semantic Cache (added for production speed)
-            self.cache = SemanticCache(similarity_threshold=0.85)
+            self.cache = SemanticCache(config=self.config, similarity_threshold=0.85)
             logger.info("   • Semantic Cache initialized")
             
             # Context Compressor
@@ -81,7 +80,7 @@ class RAGEngine:
 
 
     def rewrite_query(self, query: str) -> str:
-        """HyDE-style query rewriting for better retrieval."""
+        """Query rewriting for better retrieval."""
         try:
             rewrite_prompt = f"""
             You are an expert at rewriting questions for better retrieval.
@@ -103,9 +102,8 @@ class RAGEngine:
         
     def ask(self, query: str, verbose: bool = True):
         """Main query flow with detailed metrics: time + GPU VRAM usage."""
-        import time
+        
         start_total = time.time()
-
 
         try:
             # === SEMANTIC CACHE CHECK (first thing we do) ===
@@ -122,12 +120,11 @@ class RAGEngine:
                     "metrics": cached["metrics"]
                 }
 
-     
             # Normal flow continues if cache miss
             if verbose:
                 logger.info(f"\n🔍 Query received: {query}")
 
-            # HyDE Query Rewriting (improves retrieval quality)
+            # Query Rewriting (improves retrieval quality)
             rewritten_query = self.rewrite_query(query)
             if verbose and rewritten_query != query:
                 logger.info(f"→ Rewritten query: {rewritten_query}")
