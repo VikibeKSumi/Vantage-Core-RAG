@@ -41,6 +41,7 @@ class LLMService:
 
         # Reliable TPS calculation (fixed for LlamaIndex + Groq 2026)
         tps = output_tokens / getattr(response, 'response_time', 1)
+       
         return {
             "answer": response.text,
             "input_tokens": input_tokens,

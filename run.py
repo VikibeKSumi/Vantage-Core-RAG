@@ -1,7 +1,14 @@
 from src.engine import Engine
-
+from loguru import logger
 if __name__ == "__main__":
     
     engine = Engine()
-    query = "is there any budget for semiconductor for 2027? what are the estimated expenses for different sectors?"
-    engine.run(query)
+    while True:
+        query = input("Enter 'Exit' to quit: ")
+        if query.lower() == 'exit':
+            break
+        result = engine.run(query)
+        
+        for keys, value in result.items():
+            print(f"{keys}: {value}")
+    logger.info(".....Engine Close.......")

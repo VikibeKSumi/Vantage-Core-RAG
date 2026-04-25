@@ -1,6 +1,7 @@
 
 import os
 import torch
+import time
 from pathlib import Path
 
 from llama_index.core import VectorStoreIndex
@@ -71,31 +72,42 @@ class Engine():
 
     def run(self, query: str):
         logger.info(f"running a query")
+        logger.info(f"running on {self.device}")
+        t0 = time.perf_counter()
         #is_cache = self.semantic_cache.get(query)
         
         #if is_cache:
         #   return is_cache
         
         logger.info(f"retrieving from index....")
+        t1 = time.perf_counter()
         retrieved_response = self.retriever.retrieve(
             query=query,
             index=self.index,
             top_k=4
         )
+        retrieval_time = round(time.perf_counter()-t1, 2)
+
         logger.info(f"reranking retrieved responses....")
+        
         reranked_response = self.reranker.rerank(
             query=query,
             retrieved_response=retrieved_response,
         )
-
+        
         logger.info(f"compressing reranked response....")
         compressed_response = self.compression.compress(reranked_response)
 
         logger.info(f"generating response....")
+        t2 = time.perf_counter()
         result = self.llm.generate_response(query, compressed_response)
+        generation_time = round(time.perf_counter()-t2, 2)
+        total_latency = round(time.perf_counter()-t0, 2)
 
-        print("-------OUTPUT--------")
-        print(result)
+        result['retrieval_time'] = retrieval_time
+        result['generation_time'] = generation_time
+        result['total_latency'] = total_latency
+
         return result
 
         
