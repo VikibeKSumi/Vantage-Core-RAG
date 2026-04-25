@@ -8,7 +8,7 @@ class Metrics:
     retrieval_time: float
     generation_time: float
     rerank_scores: list[float]
-    tokens_used: int
+    total_tokens: int
     tokens_per_second: float
     peak_vram_mb: Optional[float] = None
     cache_hit: bool = False
