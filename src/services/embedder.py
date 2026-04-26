@@ -9,6 +9,6 @@ class Embedder():
     def encode(self, query: List[str]):
         
         return self.embedding_model.get_text_embedding_batch(
-            query,
+            [query]
         )
         

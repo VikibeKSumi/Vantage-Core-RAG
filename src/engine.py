@@ -11,15 +11,14 @@ from llama_index.core.postprocessor import SentenceTransformerRerank
 from .config.config import config
 
 from .services.vector_store import VectorDBManager
-from .services.embedder import Embedder
 from .services.llm import LLMService
 
-from .core.text_utils import TextUtils
-
+from .pipeline.query_rewriter import QueryRewriter
 from .pipeline.cache import SemanticCache
-from .pipeline.compression import ContextCompressor
 from .pipeline.retrieval import Retriever
 from .pipeline.reranker import Reranker
+from .pipeline.compression import ContextCompressor
+
 
 from loguru import logger
 
@@ -37,11 +36,11 @@ class Engine():
         self.device = "cuda" if torch.cuda.is_available() else "cpu"
         self.db_path = str(Path(self.config.database.get('db_path')))
         self.db_collection_name = self.config.database.get("collection_name")
-        self.llm_model = self.config.models.get("llm")
+        self.llm_model_name = self.config.models.get("llm")
         self.api_key = os.getenv("GROQ_API_KEY")
 
 
-        self.similarity_threshold = 0.85
+        self.cache_similarity_threshold = 0.92
 
         logger.info(f"embedding model loading....")
         self.embedding_model = HuggingFaceEmbedding(
@@ -54,60 +53,78 @@ class Engine():
             top_n=4
         )
 
-        
-        self.embedder = Embedder(embedding_model=self.embedding_model)
+    
+        self.query_rewritter = QueryRewriter(api_key=self.api_key, model_name=self.llm_model_name)
+        self.semantic_cache = SemanticCache(embedding_model=self.embedding_model, cache_similarity_threshold=self.cache_similarity_threshold)
+        self.vector_store = VectorDBManager(db_path=self.db_path, collection_name=self.db_collection_name)
         self.retriever = Retriever()
         self.reranker = Reranker(reranking_model=self.reranking_model)
-        self.vector_store = VectorDBManager(db_path=self.db_path, collection_name=self.db_collection_name)
-        self.llm = LLMService(llm_model=self.llm_model, api_key=self.api_key)
-
-        self.semantic_cache = SemanticCache(embedder=self.embedder, similarity_threshold=self.similarity_threshold)
         self.compression = ContextCompressor()
+        self.generator = LLMService(llm_model=self.llm_model_name, api_key=self.api_key)
 
-        
         self.index = VectorStoreIndex.from_vector_store(
             vector_store=self.vector_store.get_vector_store(),
             embed_model=self.embedding_model
         )
+        
 
     def run(self, query: str):
         logger.info(f"running a query")
         logger.info(f"running on {self.device}")
+
+        logger.info(f"rewritting query....")
         t0 = time.perf_counter()
-        #is_cache = self.semantic_cache.get(query)
         
-        #if is_cache:
-        #   return is_cache
+        rewritten_query = self.query_rewritter.rewrite(query=query)
+        #print(f"Original: {query} | Rewritten : {rewritten_query}")
+        is_cache, cache_return = self.semantic_cache.get(rewritten_query)
         
-        logger.info(f"retrieving from index....")
-        t1 = time.perf_counter()
-        retrieved_response = self.retriever.retrieve(
-            query=query,
-            index=self.index,
-            top_k=4
-        )
-        retrieval_time = round(time.perf_counter()-t1, 2)
-
-        logger.info(f"reranking retrieved responses....")
+        if is_cache:
+            logger.info(f"cach hit: returning instant response....")
+            info = cache_return
+            return info
         
-        reranked_response = self.reranker.rerank(
-            query=query,
-            retrieved_response=retrieved_response,
-        )
+        else:
+            logger.info(f"retrieving from index....")
+            t1 = time.perf_counter()
+            retrieved_response = self.retriever.retrieve(
+                query=rewritten_query,
+                index=self.index,
+                top_k=20
+            )
+            retrieval_time = round(time.perf_counter()-t1, 2)
+
+
+            logger.info(f"reranking retrieved responses....")
+            reranked_response = self.reranker.rerank(
+                query=rewritten_query,
+                retrieved_response=retrieved_response,
+            )
+            
+
+            logger.info(f"compressing reranked response....")
+            compressed_response = self.compression.compress(reranked_response)
+
+            logger.info(f"generating response....")
+            t2 = time.perf_counter()
+            result = self.generator.generate_response(rewritten_query, compressed_response)
+            generation_time = round(time.perf_counter()-t2, 2)
+            total_latency = round(time.perf_counter()-t0, 2)
+
+            result['retrieval_time'] = retrieval_time
+            result['generation_time'] = generation_time
+            result['total_latency'] = total_latency
+            result['cache_hit'] = False
         
-        logger.info(f"compressing reranked response....")
-        compressed_response = self.compression.compress(reranked_response)
+            embedded_query = cache_return
 
-        logger.info(f"generating response....")
-        t2 = time.perf_counter()
-        result = self.llm.generate_response(query, compressed_response)
-        generation_time = round(time.perf_counter()-t2, 2)
-        total_latency = round(time.perf_counter()-t0, 2)
+            self.semantic_cache.store(
+                query=rewritten_query, 
+                result=result,
+                embedded_query=embedded_query,
+            )
 
-        result['retrieval_time'] = retrieval_time
-        result['generation_time'] = generation_time
-        result['total_latency'] = total_latency
 
-        return result
+            return result
 
         
