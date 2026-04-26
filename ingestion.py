@@ -39,14 +39,15 @@ def ingestion():
     )
     
     documents = reader.load_data()
-    logger.info(f"loaded {len(documents)} document pages")
+    logger.info(f"loaded {len(documents)} document pages....")
 
     # 2. Chunking
     splitter = SemanticSplitterNodeParser(
         buffer_size=1,
-        breakpoint_percentile_threshold=95,
+        breakpoint_percentile_threshold=70,
         embed_model=Settings.embed_model
     )
+    logger.info("chunking documents....")
     nodes = splitter.get_nodes_from_documents(documents)
     logger.info(f"created {len(nodes)} chunks....")
 

@@ -9,5 +9,5 @@ class Retriever:
 
     def retrieve(self, query: str, index, top_k: int = 20) -> List[NodeWithScore]:
         normalized_query = self.textutils.normalize(query=query)
-        retriever = index.as_retriever(similarity_top_k=top_k)
+        retriever = index.as_retriever(similarity_top_k=top_k) # <- LlamaIndex embeddes query internally
         return retriever.retrieve(normalized_query)

@@ -7,7 +7,7 @@ from groq import RateLimitError, APIConnectionError
 class LLMService:
 
     def __init__(self, llm_model: str, api_key: str):
-        self.llm = Groq(
+        self.groq_llm = Groq(
             model=llm_model,
             api_key=api_key
         )
@@ -18,7 +18,7 @@ class LLMService:
         retry=retry_if_exception_type((RateLimitError, APIConnectionError)),
         reraise=True
     )
-    def generate_response(self, query: str, context_nodes: list):
+    def  generate_response(self, query: str, context_nodes: list):
         """Returns answer + full token metrics (final version)."""
         context_text = "\n\n".join([
             node.node.get_content(metadata_mode=MetadataMode.NONE)
@@ -30,9 +30,11 @@ class LLMService:
             f"Query: {query}\n\n"
             "As an Advisor, provide a concise, grounded answer based strictly on the context. "
             "If the information is not present, admit it. Match the query's language."
+            "Always respond in English regardless of the language of the source documents. "
+
         )
 
-        response = self.llm.complete(prompt)
+        response = self.groq_llm.complete(prompt)
 
         # Extract token usage from Groq (LlamaIndex 2026 format)
         usage = getattr(response.raw, 'usage', None) if hasattr(response, 'raw') else None
