@@ -1,7 +1,6 @@
 # VantageCoreRAG
 
-**Optimized Low-Resource Bi-Encoder + Cross-Encoder RAG Pipeline **  
-*For Consumer Hardware (4GB VRAM + 5.6GB RAM)*
+**Two-stage retrieval with modular design and centralized configuration**  
 
 ![Python](https://img.shields.io/badge/Python-3.10+-blue)
 ![GPU](https://img.shields.io/badge/GPU-4GB_VRAM-green)
@@ -10,55 +9,36 @@
 
 ---
 
-### Why Vantage Core-RAG?
-
-A clean, low-resource Retrieval-Augmented Generation system engineered to run **efficiently on modest consumer hardware** (4GB VRAM + 5.6GB RAM) while delivering **high-quality retrieval**.
-
----
-
 ### ✨ Key Features
 
-- **Two-stage retrieval** (Bi-Encoder + Cross-Encoder) for superior relevance on Indic economic documents
-- **Semantic Cache** – Instant responses for similar/repeated queries (major latency win)
-- **Query Rewriting**: Improves retrieval quality by rewriting user questions
-- **Context Compression**: Reduces tokens sent to Groq (faster & cheaper generation).
-- **Full GPU acceleration** for both embedding and reranking (optimized for 4 GB VRAM)
-- **Local persistent Qdrant** vector store with hybrid search enabled
-- **Native Indic text support** via Devanagari normalization
-- **Production Observability**: FastAPI `/health` + Prometheus-compatible `/metrics` endpoint
-- **Structured Logging** with Loguru (console + file)
-- **Automatic Retries & Rate Limiting**: Graceful handling of Groq API limits
-- **Comprehensive evaluation suite** with full latency breakdown, token usage, VRAM tracking, and P95 metrics
-- **Clean, centralized architecture** with single configuration and zero model duplication
-- **Streamlit UI** with live metrics display
-- **Production-ready Docker support** (Dockerfile + docker-compose ready)
-- **Robust error handling** & graceful degradation
-- **Extremely low resource footprint** — runs comfortably on 5.6 GB RAM + 4 GB VRAM
-
+- **Two-stage retrieval**: Bi-encoder and Cross-encoder
+- **Semantic cache**: Instant cached responses
+- **Query rewriting**: Rewrites user query for better context retrieval
+- **Context compression**: Reduces tokens sent to LLM
+- **GPU acceleration**: For both embedding and reranking
+- **Persistent vectordb**: Uses Qdrant server
+- **Indic text normalization**: Used devanagari normalization
+- **Evaluation**: Ragas evaluation on 50 golden dataset
+- **Logging**: Console logging monitor with Loguru
+- **Centralized configuration**: Single configuration with zero duplication
+- **Modular design**: Each component separated by its concern
+- **API exposure**: FastAPI enabled
 ---
 
 ### 🛠 Tech Stack
 
-- **Embedding**: `BAAI/bge-large-en-v1.5`
-- **Reranker**: `BAAI/bge-reranker-v2-m3`
-- **Vector Store**: Qdrant (local)
-- **LLM**: Groq (llama-3.3-70b-versatile)
-- **Framework**: LlamaIndex + Sentence-Transformers
-- **Observability**: FastAPI + Loguru
-- **UI**: Streamlit
-
+- **Embedding**: 'BAAI/bge-small-en-v1.5'
+- **Reranker**: 'BAAI/bge-reranker-base'
+- **LLM**: 'llama-3.3-70b-versatile'
+- **Framework**: LlamaIndex
+- **Vector Store**: Qdrant server
+- **Evaluation**: RAGAS + Langchain
 ---
 
-### 📈 Current Performance (Batch Process)
-**Under consumer hardware constraints (4GB VRAM + 5.6GB RAM) and Groq API:**
+### 📈 Current Performance (13 Golden dataset evaluation)
 
-- Average Total Latency: **19.67 seconds**
-- Retrieval + Rerank: **0.59 seconds**
-- Peak VRAM: **1.18 GB**
-- Empty Retrieval Rate: **0.0%**
-- Avg Tokens per Query: **2362**
-
-*Note: Latency is dominated by Groq generation. Hybrid local LLM fallback is planned for <12s average.*
+- **Faithfulness**: 1.00
+- **Relevancy**: 0.97
 
 ---
 
@@ -80,14 +60,14 @@ A clean, low-resource Retrieval-Augmented Generation system engineered to run **
     pip install -r requirements.txt
 ```
 
-# 4. Add your Groq API key (Groq Inference Provider Used Here)
+# 4. Add your Groq API key
 (Create a file named .env in the root folder and put this line inside it)
 ```env
-    GROQ_API_KEY=gsk_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx  <- Replace with your Groq API
+GROQ_API_KEY=gsk_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx  <- Replace with your Groq API
 ```
 
 # 5. Put your PDF files
-(Budget, Economic Survey provided as default inside this folder)
+(budget, economic survey provided as default inside this folder)
 ```text
     data/raw_docs/
 ```
@@ -97,24 +77,20 @@ A clean, low-resource Retrieval-Augmented Generation system engineered to run **
     python ingestion.py
 ```
 
-# 7. (Main) Run the RAG Engine
+# 7. Run Qdrant server
+(install docker have it running)
+```bash
+docker run -d -p 6333:6333 -v $(pwd)/data/qdrant_storage:/qdrant/storage qdrant/qdrant
+
+```
+# 8. (main) Run the RAG Engine
 ```bash
     python run.py
 ```
 
-# 8. (Optional but recommended) Run full Batch Evaluation
+# 9. (optional but recommended) Run ragas evaluation
 ```bash
-    python run_eval.py
-```
-Type your questions in the terminal after running python run.py. Type 'exit' to quit.
-
-# 9. (Optional but recommended) Run Streamlit UI
-```bash
-    streamlit run app.py
-```
-# 10. (Optional but recommended) Run Observability API (in another terminal)
-```
-    python api.py
+    python evaluation.py
 ```
 
 ---
@@ -123,36 +99,36 @@ Type your questions in the terminal after running python run.py. Type 'exit' to 
 
 ```text
 vantage_core_rag/
-├── run.py                    # Main CLI entry point
-├── app.py                    # Streamlit UI
-├── api.py                    # Observability API
-├── ingestion.py              # Document ingestion
-├── run_eval.py               # Full benchmarking
-├── docker-compose.yml
-├── src/
-│   ├── engine_load.py        # Core orchestration engine
-│   ├── retrieve_and_rerank.py
-│   ├── cache.py              # Semantic Cache
-│   ├── compressor.py         # Context Compression
-│   ├── logger.py
-│   ├── config.py
-│   └── ...
-├── config/settings.yaml
-└── data/raw_docs/
+|── run.py                          # Main CLI entry point
+|── ingestion.py                    # Document ingestion
+|── evaluation.py                   # RAGAS evaluation
+|── src/
+|   |── core/
+|   |   |── schemas.py
+|   |   |── text_utils.py
+|   |── pipeline/
+|   |   |── cache.py
+|   |   |── compression.py
+|   |   |── query_rewriter.py
+|   |   |── reranker.py
+|   |   |── retrieval.py
+|   |── services/     
+|   |   |── embedder.py
+|   |   |── llm.py
+|   |   |── vector_store.py    
+|   |── engine.py
+|── config/
+|   |── config.py
+|   |── settings.yaml
+|── data/
 ```
 
 ---
 
-### 🚧 Next Priorities (High Impact)
-- Hybrid local LLM fallback (biggest latency win)
-- Advanced Reranker
-- Persistent Semantic Cache (disk-backed)
-- Qdrant Server mode (true multi-service support)
-- Advanced faithfulness evaluation
-- Observability Dashboard
+### 🚧 Future Improvements
+- Agentic RAG
+- Graph based knowledge
+- Persistent cache with Redis
+- Cloud based deployment
 
 ---
-
-### Built With
-Assisted and guided by Grok (xAI) • LlamaIndex • Sentence-Transformers • Qdrant • Groq
-
