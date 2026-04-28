@@ -6,7 +6,7 @@ class VectorDBManager:
 
     def __init__(self, db_path: str, collection_name: str):
         self.client = qdrant_client.QdrantClient(
-            path=db_path
+            url="http://localhost:6333"
         )
         self.collection_name = collection_name
 
