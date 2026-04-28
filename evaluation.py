@@ -13,13 +13,20 @@ from ragas.metrics import faithfulness, answer_relevancy
 from ragas.llms import LangchainLLMWrapper
 from ragas.embeddings import LangchainEmbeddingsWrapper
 
+import os
 
-def evaluation(i: int):
+from dotenv import load_dotenv
+
+load_dotenv()
+
+
+def evaluation(n: int):
 
     engine = Engine()
+    api_key = os.environ['GROQ_API_KEY']
     llm = LangchainLLMWrapper(ChatGroq(
         model="llama-3.3-70b-versatile",
-        api_key="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"
+        api_key=api_key
     ))
     embedding = LangchainEmbeddingsWrapper(HuggingFaceEmbeddings(
         model_name="BAAI/bge-small-en-v1.5"
@@ -59,7 +66,7 @@ def evaluation(i: int):
 
 if __name__ == "__main__":
 
-    data, scores = evaluation(i=13)
+    data, scores = evaluation(n=13)
     logger.info(f"generating eval response....")
     for q, a, c, gt in zip(data["question"], data["answer"], data["contexts"], data["ground_truth"]):
         print("QUESTION:", q)

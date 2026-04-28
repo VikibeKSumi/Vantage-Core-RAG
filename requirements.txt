@@ -1,22 +1,19 @@
-# AI Core
+# Core
 sentence-transformers
 indic-nlp-library==0.92
-
-# LlamaIndex 2026 Stable Release
 llama-index
 llama-index-vector-stores-qdrant
 llama-index-embeddings-huggingface
 llama-index-llms-groq
-
-# DB & Utilities
 qdrant-client
+ragas
+
+# utilities
 pyyaml
 python-dotenv
 
 #UI and evaluation
 streamlit>=1.32.0
-pandas
-tabulate
 
 # Observability (for production-grade monitoring)
 fastapi
