@@ -9,10 +9,11 @@ load_dotenv()
 
 
 class Config:
-    """Centralized, validated configuration loader."""
+    """centralized and validated configuration"""
 
     def __init__(self):
-        self.path = Path("config/settings.yaml")
+        self.path = Path(__file__).parent / "settings.yaml"
+
 
         if not self.path.exists():
             logger.error(f"Settings file not found in {self.path}")
@@ -24,7 +25,6 @@ class Config:
         self.validate()
 
         self.api_key = os.getenv("GROQ_API_KEY")
-
         if not self.api_key:
             logger.error(f"GROQ_API_KEY not found in .env file")
             raise SystemExit(1)
