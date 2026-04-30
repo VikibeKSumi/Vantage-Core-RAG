@@ -7,6 +7,7 @@ llama-index-embeddings-huggingface
 llama-index-llms-groq
 qdrant-client
 ragas
+llama-parse
 
 # utilities
 pyyaml

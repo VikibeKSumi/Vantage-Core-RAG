@@ -35,7 +35,7 @@ class Engine():
         self.config = config
         self.embedding_model_name = self.config.models.get("embedding")
         self.reranker_model_name = self.config.models.get("reranker")
-        self.device = "cpu" #if torch.cuda.is_available() else "cpu"
+        self.device = "cuda" if torch.cuda.is_available() else "cpu"
         self.db_path = str(Path(self.config.database.get('db_path')))
         self.db_collection_name = self.config.database.get("collection_name")
         self.llm_model_name = self.config.models.get("llm")
@@ -72,8 +72,7 @@ class Engine():
         
 
     def run(self, query: str, eval_report: bool = False) -> Dict:
-        if eval_report:
-            logger.info(f"Evaluation is running....")
+    
         logger.info(f"running a query")
         logger.info(f"running on {self.device}")
 
@@ -97,28 +96,29 @@ class Engine():
             index=self.index,
             top_k=20
         )
-        response = retrieved_response
         retrieval_time = round(time.perf_counter()-t1, 2)
 
     
         logger.info(f"reranking retrieved responses....")
+        t2 = time.perf_counter()
         reranked_response = self.reranker.rerank(
             query=rewritten_query,
             retrieved_response=retrieved_response,
         )
-        response = reranked_response
+        reranking_time = round(time.perf_counter()-t2, 2)
             
         
         logger.info(f"compressing reranked response....")
-        compressed_response = self.compression.compress(response)
+        compressed_response = self.compression.compress(reranked_response)
 
         logger.info(f"generating response....")
-        t2 = time.perf_counter()
+        t3 = time.perf_counter()
         result = self.generator.generate_response(rewritten_query, compressed_response)
-        generation_time = round(time.perf_counter()-t2, 2)
+        generation_time = round(time.perf_counter()-t3, 2)
         total_latency = round(time.perf_counter()-t0, 2)
 
         result['retrieval_time'] = retrieval_time
+        result['reranking_time'] = reranking_time
         result['generation_time'] = generation_time
         result['total_latency'] = total_latency
         result['cache_hit'] = False

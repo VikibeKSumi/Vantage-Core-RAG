@@ -3,7 +3,7 @@
 project_name: "XXX"
 models:
   llm: "llama-3.3-70b-versatile" 
-  embedding: "BAAI/bge-small-en-v1.5"
+  embedding: "BAAI/bge-small-en-v1.5" # 384-dimension
   reranker: "BAAI/bge-reranker-base"  
 
 database:
