@@ -5,10 +5,12 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).parent / "src"))
 
 import torch
+import os
 
-from src.config.config import config
+from config.config import config
 from src.services.vector_store import VectorDBManager
 
+from llama_parse import LlamaParse
 from llama_index.core import Settings, SimpleDirectoryReader, VectorStoreIndex
 from llama_index.core.node_parser import SemanticSplitterNodeParser
 from llama_index.embeddings.huggingface import HuggingFaceEmbedding
@@ -26,18 +28,30 @@ def ingestion():
     embed_model_name = config.models.get("embedding")
     device = "cuda" if torch.cuda.is_available() else "cpu"
 
+    llamaParse_api_key = os.environ["LLAMA_CLOUD_API_KEY"]
+
+
     Settings.embed_model = HuggingFaceEmbedding(
         model_name=embed_model_name,
         device=device
     )
 
-    # 1. Load raw documents
-    logger.info(f"Loading documents....")
+    parser = LlamaParse(
+        api_key=llamaParse_api_key,
+        result_type="markdown",
+        split_by_page=False,
+        verbose=True
+    )
+    file_extractor = { '.pdf': parser}
+
+    logger.info(f"Loading docs....")
     reader = SimpleDirectoryReader(
-        input_dir=str(raw_data_path),
+        input_dir=raw_data_path,
+        file_extractor=file_extractor,
         recursive=True
     )
     
+    logger.info("Parsing docs....")
     documents = reader.load_data()
     logger.info(f"loaded {len(documents)} document pages....")
 
@@ -47,7 +61,8 @@ def ingestion():
         breakpoint_percentile_threshold=70,
         embed_model=Settings.embed_model
     )
-    logger.info("chunking documents....")
+    
+    logger.info("chunking docs....")
     nodes = splitter.get_nodes_from_documents(documents)
     logger.info(f"created {len(nodes)} chunks....")
 
@@ -60,13 +75,12 @@ def ingestion():
 
     storage_context = db_manager.get_storage_context()
 
-    logger.info("building vector index....")
+    logger.info("building index....")
     _ = VectorStoreIndex(
         nodes=nodes,
         storage_context=storage_context,
         embed_model=Settings.embed_model
     )
-
     logger.info(".......Ingestion Successful!!.......")
 
 

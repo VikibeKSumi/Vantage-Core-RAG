@@ -8,7 +8,7 @@ from loguru import logger
 from langchain_groq import ChatGroq
 from langchain_huggingface import HuggingFaceEmbeddings
 
-from ragas import evaluate
+from ragas import evaluate, RunConfig
 from ragas.metrics import faithfulness, answer_relevancy
 from ragas.llms import LangchainLLMWrapper
 from ragas.embeddings import LangchainEmbeddingsWrapper
@@ -21,7 +21,8 @@ load_dotenv()
 
 
 def evaluation(n: int):
-
+    
+    logger.info(".......Evaluation is running.......")
     engine = Engine()
     api_key = os.environ['GROQ_API_KEY']
     llm = LangchainLLMWrapper(ChatGroq(
@@ -60,7 +61,8 @@ def evaluation(n: int):
         dataset=data_set,
         metrics=[faithfulness,answer_relevancy],
         llm=llm,
-        embeddings=embedding
+        embeddings=embedding,
+        run_config=RunConfig(max_workers=2, timeout=120)
     )
     return data, scores
 
@@ -68,11 +70,11 @@ if __name__ == "__main__":
 
     data, scores = evaluation(n=13)
     logger.info(f"generating eval response....")
-    for q, a, c, gt in zip(data["question"], data["answer"], data["contexts"], data["ground_truth"]):
+    '''for q, a, c, gt in zip(data["question"], data["answer"], data["contexts"], data["ground_truth"]):
         print("QUESTION:", q)
         print("ANSWER:", a)
         print("CONTEXT LENGTH:", len(c))
-        print("GROUND TRUTH:", gt)
+        print("GROUND TRUTH:", gt)'''
 
     print(f"SCORES: {scores}")
 
