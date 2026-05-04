@@ -12,7 +12,7 @@ def mock_index():
     return mock_index
 
 @pytest.fixture
-def retrieve_obj(mock_index): # <- mocks passed to the class. Now it's all connected.
+def retrieve_obj(): # <- no need to pass mocks. The mock is independent of the class.
     return Retriever()
 
 

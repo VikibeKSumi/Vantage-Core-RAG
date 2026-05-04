@@ -13,8 +13,8 @@ def mock_rerank_model():
     return mock_model
 
 @pytest.fixture
-def rerank(mock_rerank_model):
-    return Reranker(reranking_model=mock_rerank_model)
+def rerank(mock_rerank_model): # <- mocks passed here to be used
+    return Reranker(reranking_model=mock_rerank_model) # <- mocks used here and becomes connected with the real one.
 
 def test_rerank(rerank):
     reranked_response = rerank.rerank(query="test query", retrieved_response=[NodeWithScore(node=TextNode(text="test"), score=1.0)])

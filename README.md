@@ -21,6 +21,7 @@
 - **Evaluation**: Ragas evaluation on 50 golden dataset
 - **Logging**: Console logging monitor with Loguru
 - **Centralized configuration**: Single configuration with zero duplication
+- **Tests**: Tests for cache, compression, rerank, retrieve
 - **Modular design**: Each component separated by its concern
 - **API exposure**: FastAPI enabled
 ---
