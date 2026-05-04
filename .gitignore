@@ -211,6 +211,7 @@ __marimo__/
 *.pyc
 *.pyo
 *.pyd
+*.ini
 technical.md
 evaluation_results.csv
 tender-wishing-starlight.md
@@ -218,5 +219,4 @@ tender-wishing-starlight.md
 claude/
 __pycache__/
 data/qdrant_storage/
-data/qdrant_storage/.lock
-data/qdrant_storage/meta.json
+
