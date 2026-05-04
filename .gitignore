@@ -216,7 +216,7 @@ technical.md
 evaluation_results.csv
 tender-wishing-starlight.md
 .DS_Store
-claude/
+.claude/
 __pycache__/
 data/qdrant_storage/
 

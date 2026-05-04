@@ -1,9 +1,0 @@
-{
-  "permissions": {
-    "allow": [
-      "Bash(del \"c:\\\\Users\\\\vikib\\\\Documents\\\\ai_projects\\\\vantage_core_rag\\\\src\\\\ai_core.py\" \"c:\\\\Users\\\\vikib\\\\Documents\\\\ai_projects\\\\vantage_core_rag\\\\src\\\\cache.py\" \"c:\\\\Users\\\\vikib\\\\Documents\\\\ai_projects\\\\vantage_core_rag\\\\src\\\\compressor.py\" \"c:\\\\Users\\\\vikib\\\\Documents\\\\ai_projects\\\\vantage_core_rag\\\\src\\\\database.py\" \"c:\\\\Users\\\\vikib\\\\Documents\\\\ai_projects\\\\vantage_core_rag\\\\src\\\\engine_load.py\" \"c:\\\\Users\\\\vikib\\\\Documents\\\\ai_projects\\\\vantage_core_rag\\\\src\\\\generation.py\" \"c:\\\\Users\\\\vikib\\\\Documents\\\\ai_projects\\\\vantage_core_rag\\\\src\\\\retrieve_and_rerank.py\")",
-      "Bash(python -c \"import torch; print\\(torch.cuda.is_available\\(\\)\\); print\\(torch.cuda.get_device_name\\(0\\) if torch.cuda.is_available\\(\\) else 'CPU only'\\)\")",
-      "Bash(conda run *)"
-    ]
-  }
-}
