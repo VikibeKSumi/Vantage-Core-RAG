@@ -217,6 +217,6 @@ evaluation_results.csv
 tender-wishing-starlight.md
 .DS_Store
 .claude/
-__pycache__/
 data/qdrant_storage/
+data/raw_docs
 

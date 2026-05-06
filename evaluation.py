@@ -70,11 +70,11 @@ if __name__ == "__main__":
 
     data, scores = evaluation(n=13)
     logger.info(f"generating eval response....")
-    '''for q, a, c, gt in zip(data["question"], data["answer"], data["contexts"], data["ground_truth"]):
+    for q, a, c, gt in zip(data["question"], data["answer"], data["contexts"], data["ground_truth"]):
         print("QUESTION:", q)
         print("ANSWER:", a)
         print("CONTEXT LENGTH:", len(c))
-        print("GROUND TRUTH:", gt)'''
+        print("GROUND TRUTH:", gt)
 
     print(f"SCORES: {scores}")
 

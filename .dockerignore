@@ -1,11 +1,10 @@
-venv/
-.env
-__pycache__/
 *.pyc
-data/qdrant_storage/*
 .git
+.env
 .gitignore
 README.md
+venv/
+__pycache__/
 evaluation_results.csv
 data/qdrant_storage/
 
