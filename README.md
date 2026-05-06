@@ -18,10 +18,11 @@
 - **GPU acceleration**: For both embedding and reranking
 - **Persistent vectordb**: Uses Qdrant server
 - **Indic text normalization**: Used devanagari normalization
+- **Web Scrapping**: Downloaded datas by scrapping webpages
 - **Evaluation**: Ragas evaluation on 50 golden dataset
 - **Logging**: Console logging monitor with Loguru
-- **Centralized configuration**: Single configuration with zero duplication
 - **Tests**: Tests for cache, compression, rerank, retrieve
+- **Centralized configuration**: Single configuration with zero duplication
 - **Modular design**: Each component separated by its concern
 - **API exposure**: FastAPI enabled
 ---
