@@ -18,7 +18,7 @@
 - **GPU acceleration**: For both embedding and reranking
 - **Persistent vectordb**: Uses Qdrant server
 - **Indic text normalization**: Used devanagari normalization
-- **Web Scrapping**: Downloaded datas by scrapping webpages
+- **Web scrapping**: Downloaded datas by scrapping webpages
 - **Evaluation**: Ragas evaluation on 50 golden dataset
 - **Logging**: Console logging monitor with Loguru
 - **Tests**: Tests for cache, compression, rerank, retrieve
