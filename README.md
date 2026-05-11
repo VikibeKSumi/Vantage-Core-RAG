@@ -12,22 +12,22 @@
 ### ✨ Key Features
 
 - **Two-stage retrieval**: Bi-encoder and Cross-encoder
-- **Semantic cache**: Instant cached responses
-- **Query rewriting**: Rewrites user query for better context retrieval
-- **Context compression**: Reduces tokens sent to LLM
-- **GPU acceleration**: For both embedding and reranking
-- **Persistent vectordb**: Uses Qdrant server for embedding storage
-- **Persistent cache**: Uses redis for fast cache storage
+- **Semantic cache**: Cache response based on meaning
+- **Query rewriting**: Rewrites user query for accurate retrieval
+- **Context compression**: Slices word count sent to LLM
+- **GPU acceleration**: For fast processing of embedding and reranking
+- **Vectordb**: To store embedded document vectors
+- **Persistent cache**: To store cache permanently
 - **Hashing**: Check file duplicates to prevent re-ingestion
-- **Indic text normalization**: Used devanagari normalization
+- **Indic text normalization**: To analyse Hindi language in govt. docs
 - **Data collection**: Collected datas by scrapping webpages
 - **Evaluation**: Ragas evaluation on 50 golden dataset
-- **Logging**: Console logging monitor with Loguru
-- **Testing**: Tests for cache, compression, rerank, retrieve
+- **Logging**: Console logging to monitor process.
+- **Testing**: Unit test for cache, compression, rerank, retrieve
 - **Centralized configuration**: Single configuration with zero duplication
 - **Modular design**: Each component separated by its concern
-- **API exposure**: FastAPI enabled
-- **API authentication**: secret key api authentication
+- **API exposure**: API enabled for accessiblity
+- **API authentication**: To prevent unauthorized access from outside
 - **Docker compose**: Multiple docker image orchestration
 ---
 
