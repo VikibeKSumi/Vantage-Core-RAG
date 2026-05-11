@@ -22,7 +22,7 @@
 - **Indic text normalization**: To analyse Hindi language in govt. docs
 - **Data collection**: Collected datas by scrapping webpages
 - **Evaluation**: Ragas evaluation on 50 golden dataset
-- **Logging**: Console logging to monitor process.
+- **Logging**: Console logging to monitor processes
 - **Testing**: Unit test for cache, compression, rerank, retrieve
 - **Centralized configuration**: Single configuration with zero duplication
 - **Modular design**: Each component separated by its concern
