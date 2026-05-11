@@ -1,3 +1,13 @@
+---
+title: VantageCoreRAG
+emoji: 🔍
+colorFrom: blue
+colorTo: green
+sdk: docker
+pinned: false
+---
+
+
 # VantageCoreRAG
 
 **Two-stage retrieval with modular design and centralized configuration**  
