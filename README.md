@@ -16,7 +16,9 @@
 - **Query rewriting**: Rewrites user query for better context retrieval
 - **Context compression**: Reduces tokens sent to LLM
 - **GPU acceleration**: For both embedding and reranking
-- **Persistent vectordb**: Uses Qdrant server
+- **Persistent vectordb**: Uses Qdrant server for embedding storage
+- **Persistent cache**: Uses redis for fast cache storage
+- **Hashing**: Check file duplicates to prevent re-ingestion
 - **Indic text normalization**: Used devanagari normalization
 - **Data collection**: Collected datas by scrapping webpages
 - **Evaluation**: Ragas evaluation on 50 golden dataset
@@ -25,6 +27,8 @@
 - **Centralized configuration**: Single configuration with zero duplication
 - **Modular design**: Each component separated by its concern
 - **API exposure**: FastAPI enabled
+- **API authentication**: secret key api authentication
+- **Docker compose**: Multiple docker image orchestration
 ---
 
 ### 🛠 Tech Stack
