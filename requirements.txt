@@ -1,25 +1,37 @@
 # Core
-sentence-transformers
-indic-nlp-library==0.92
 llama-index
 llama-index-vector-stores-qdrant
 llama-index-embeddings-huggingface
 llama-index-llms-groq
+llama-index-readers-file
 qdrant-client
-ragas
-llama-parse
+sentence-transformers
+
+# LLM
+groq
+tenacity
+
+#cache
+redis
+
+#pdf parsing
+pymupdf
+
+#scraping
+requests
 
 # utilities
 pyyaml
 python-dotenv
+loguru
 
-#UI and evaluation
-streamlit>=1.32.0
-
-# Observability (for production-grade monitoring)
+# API
 fastapi
 uvicorn[standard]
-loguru>=0.7.0
+pydantic
 
-tenacity>=8.5.0
-groq
+#Evaluation
+ragas
+
+# NLP
+indic-nlp-library==0.92

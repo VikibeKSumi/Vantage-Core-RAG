@@ -1,15 +1,30 @@
-import torch
-from llama_index.embeddings.huggingface import HuggingFaceEmbedding
-from typing import Dict
 import time
+from typing import Dict
+
+import torch
+import pickle
+from redis import Redis
+from llama_index.embeddings.huggingface import HuggingFaceEmbedding
 
 class SemanticCache:
-    
 
     def __init__(self, embedding_model: HuggingFaceEmbedding, cache_similarity_threshold: float = 0.85):
         self.embedding_model = embedding_model
         self.cache_similarity_threshold = cache_similarity_threshold
+        self.redis = Redis(
+            host="localhost",
+            port=6379
+        )
         self.cache: Dict[str, dict] = {}
+        self._load_from_redis()
+
+
+    def _load_from_redis(self):
+
+        for key in self.redis.keys("cache:*"): # list of keys in 'binary' 
+            _key = key.decode().removeprefix("cache:") # <- getting keys from redis
+            _value = pickle.loads(self.redis.get(key))  # <- getting values from redis
+            self.cache[_key] = _value
 
 
     def get(self, query: str) -> tuple:
@@ -40,9 +55,16 @@ class SemanticCache:
         return False, embedded_query
 
     def store(self, query: str, result: dict, embedded_query: torch.tensor):
-
-        self.cache[query] = {
+    
+        _key = query 
+        _value ={
             "result": result,
             "embedding": embedded_query,
             "timestamp": time.time()
-        }
+            } 
+        
+        self.cache[_key] = _value
+        self.redis.set(
+            f"cache:{_key}",  # adding prefix. Redis has built-in conversion for bytes
+            pickle.dumps(_value) # <- converting to binary before storing to redis
+        ) 

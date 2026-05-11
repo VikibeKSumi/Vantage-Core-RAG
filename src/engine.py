@@ -1,47 +1,41 @@
-
 import os
-import torch
 import time
 from pathlib import Path
 from typing import Dict
 
-
+import torch
+from loguru import logger
+from dotenv import load_dotenv
 from llama_index.core import VectorStoreIndex
 from llama_index.embeddings.huggingface import HuggingFaceEmbedding
 from llama_index.core.postprocessor import SentenceTransformerRerank
 
 from config.config import config
-
 from .services.vector_store import VectorDBManager
 from .services.llm import LLMService
-
 from .pipeline.query_rewriter import QueryRewriter
 from .pipeline.cache import SemanticCache
 from .pipeline.retrieval import Retriever
 from .pipeline.reranker import Reranker
 from .pipeline.compression import ContextCompressor
 
-
-from loguru import logger
-
-from dotenv import load_dotenv
 load_dotenv()
 
 
 class Engine():
     
     def __init__(self):
+
         logger.info("......RAG Engine is On...........")
+
         self.config = config
         self.embedding_model_name = self.config.models.get("embedding")
         self.reranker_model_name = self.config.models.get("reranker")
-        self.device = "cuda" if torch.cuda.is_available() else "cpu"
-        self.db_path = str(Path(self.config.database.get('db_path')))
         self.db_collection_name = self.config.database.get("collection_name")
         self.llm_model_name = self.config.models.get("llm")
+        self.device = "cuda" if torch.cuda.is_available() else "cpu"
+        self.db_path = str(Path(self.config.database.get('db_path')))
         self.api_key = os.getenv("GROQ_API_KEY")
-
-
         self.cache_similarity_threshold = 0.92
 
         logger.info(f"embedding model loading....")
@@ -55,7 +49,6 @@ class Engine():
             top_n=4,
             device=self.device
         )
-
     
         self.query_rewritter = QueryRewriter(api_key=self.api_key, model_name=self.llm_model_name)
         self.semantic_cache = SemanticCache(embedding_model=self.embedding_model, cache_similarity_threshold=self.cache_similarity_threshold)
@@ -69,8 +62,8 @@ class Engine():
             vector_store=self.vector_store.get_vector_store(),
             embed_model=self.embedding_model
         )
-        
 
+        
     def run(self, query: str, eval_report: bool = False) -> Dict:
     
         logger.info(f"running a query")
@@ -88,7 +81,6 @@ class Engine():
                 info = cache_return
                 return info
         
-      
         logger.info(f"retrieving from index....")
         t1 = time.perf_counter()
         retrieved_response = self.retriever.retrieve(
@@ -97,7 +89,6 @@ class Engine():
             top_k=20
         )
         retrieval_time = round(time.perf_counter()-t1, 2)
-
     
         logger.info(f"reranking retrieved responses....")
         t2 = time.perf_counter()
@@ -105,8 +96,7 @@ class Engine():
             query=rewritten_query,
             retrieved_response=retrieved_response,
         )
-        reranking_time = round(time.perf_counter()-t2, 2)
-            
+        reranking_time = round(time.perf_counter()-t2, 2) 
         
         logger.info(f"compressing reranked response....")
         compressed_response = self.compression.compress(reranked_response)

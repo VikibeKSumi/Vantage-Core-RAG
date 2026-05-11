@@ -212,7 +212,6 @@ __marimo__/
 *.pyo
 *.pyd
 *.ini
-technical.md
 evaluation_results.csv
 tender-wishing-starlight.md
 .DS_Store

@@ -18,10 +18,10 @@
 - **GPU acceleration**: For both embedding and reranking
 - **Persistent vectordb**: Uses Qdrant server
 - **Indic text normalization**: Used devanagari normalization
-- **Web scrapping**: Downloaded datas by scrapping webpages
+- **Data collection**: Collected datas by scrapping webpages
 - **Evaluation**: Ragas evaluation on 50 golden dataset
 - **Logging**: Console logging monitor with Loguru
-- **Tests**: Tests for cache, compression, rerank, retrieve
+- **Testing**: Tests for cache, compression, rerank, retrieve
 - **Centralized configuration**: Single configuration with zero duplication
 - **Modular design**: Each component separated by its concern
 - **API exposure**: FastAPI enabled
@@ -39,8 +39,7 @@
 
 ### 📈 Current Performance (13 Golden dataset evaluation)
 
-- **Faithfulness**: 1.00
-- **Relevancy**: 0.97
+- **Faithfulness**: 0.96
 
 ---
 
@@ -132,5 +131,5 @@ vantage_core_rag/
 - Graph based knowledge
 - Persistent cache with Redis
 - Cloud based deployment
-
+-
 ---
