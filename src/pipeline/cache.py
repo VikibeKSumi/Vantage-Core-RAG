@@ -1,5 +1,7 @@
 import time
 from typing import Dict
+import os
+
 
 import torch
 import pickle
@@ -13,7 +15,9 @@ class SemanticCache:
         self.embedding_model = embedding_model
         self.cache_similarity_threshold = cache_similarity_threshold
         logger.info("loading redis....")
-        self.redis = Redis.from_env()
+        self.redis = Redis.from_url(
+            os.getenv("REDIS_URL", "redis://localhost:6379"),
+        )
         self.cache: Dict[str, dict] = {}
         self._load_from_redis()
 
