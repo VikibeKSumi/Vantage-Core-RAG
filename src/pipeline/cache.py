@@ -3,6 +3,7 @@ from typing import Dict
 
 import torch
 import pickle
+from loguru import logger
 from redis import Redis
 from llama_index.embeddings.huggingface import HuggingFaceEmbedding
 
