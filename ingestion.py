@@ -32,9 +32,9 @@ def unique_files(hash_data_path: Path, raw_docs_path: Path):
     for doc_path in raw_docs_path.glob("*.pdf"):
         with open(doc_path, "rb") as f:
             doc_hash = hashlib.sha256(f.read()).hexdigest()
-        if doc_hash not in hash_set:
-            hash_set.add(doc_hash)
-            input_files.append(doc_path)
+        if doc_hash not in hash_set: #<- checks here
+            hash_set.add(doc_hash) #<- unique hash here
+            input_files.append(doc_path) #<- unique files here
 
     return input_files, hash_set
 

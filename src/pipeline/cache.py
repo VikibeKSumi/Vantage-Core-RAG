@@ -11,10 +11,8 @@ class SemanticCache:
     def __init__(self, embedding_model: HuggingFaceEmbedding, cache_similarity_threshold: float = 0.85):
         self.embedding_model = embedding_model
         self.cache_similarity_threshold = cache_similarity_threshold
-        self.redis = Redis(
-            host="localhost",
-            port=6379
-        )
+        logger.info("loading redis....")
+        self.redis = Redis.from_env()
         self.cache: Dict[str, dict] = {}
         self._load_from_redis()
 

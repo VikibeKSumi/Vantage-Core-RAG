@@ -1,12 +1,14 @@
-import qdrant_client
+from qdrant_client import QdrantClient
 from llama_index.core import StorageContext
 from llama_index.vector_stores.qdrant import QdrantVectorStore
+import os
 
 class VectorDBManager:
 
     def __init__(self, db_path: str, collection_name: str):
-        self.client = qdrant_client.QdrantClient(
-            url="http://localhost:6333"
+        self.client = QdrantClient(
+            url=os.getenv("QDRANT_URL", "http://localhost:6333"),
+            api_key=os.getenv("QDRANT_API_KEY")
         )
         self.collection_name = collection_name
 
