@@ -26,7 +26,7 @@ class Engine():
     
     def __init__(self):
 
-        logger.info("......RAG Engine is On...........")
+        logger.info("......RAG engine is turning on...........")
 
         self.config = config
         self.embedding_model_name = self.config.models.get("embedding")
@@ -62,10 +62,10 @@ class Engine():
             vector_store=self.vector_store.get_vector_store(),
             embed_model=self.embedding_model
         )
-
+        logger.info("engine is live....")
         
     def run(self, query: str, eval_report: bool = False) -> Dict:
-    
+        
         logger.info(f"running a query")
         logger.info(f"running on {self.device}")
 
