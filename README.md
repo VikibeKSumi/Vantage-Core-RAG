@@ -26,8 +26,8 @@ pinned: false
 - **Query rewriting**: Rewrites user query for accurate retrieval
 - **Context compression**: Slices word count sent to LLM
 - **GPU acceleration**: For fast processing of embedding and reranking
-- **Vectordb**: To store embedded document vectors
-- **Persistent cache**: To store cache permanently
+- **Cloud vectorDB**: To store embedded document vectors
+- **Cloud persistent cache**: To store cache permanently
 - **Hashing**: Check file duplicates to prevent re-ingestion
 - **Indic text normalization**: To analyse Hindi language in govt. docs
 - **Data collection**: Collected datas by scrapping webpages
@@ -39,6 +39,7 @@ pinned: false
 - **API exposure**: API enabled for accessiblity
 - **API authentication**: To prevent unauthorized access from outside
 - **Docker compose**: Multiple docker image orchestration
+- **Cloud host**: Deployed the application to cloud
 ---
 
 ### 🛠 Tech Stack
@@ -47,8 +48,11 @@ pinned: false
 - **Reranker**: 'BAAI/bge-reranker-base'
 - **LLM**: 'llama-3.3-70b-versatile'
 - **Framework**: LlamaIndex
-- **Vector Store**: Qdrant server
+- **Vector store**: Qdrant cloud
+- **Cache store**: Redis
 - **Evaluation**: RAGAS + Langchain
+- **Cloud deploy**: Huggingface spaces
+
 ---
 
 ### 📈 Current Performance (13 Golden dataset evaluation)
