@@ -1,7 +1,6 @@
 import os
 import time
 from pathlib import Path
-from typing import Dict
 
 import torch
 from loguru import logger
@@ -9,7 +8,9 @@ from dotenv import load_dotenv
 from llama_index.core import VectorStoreIndex
 from llama_index.embeddings.huggingface import HuggingFaceEmbedding
 from llama_index.core.postprocessor import SentenceTransformerRerank
+from langgraph.graph import StateGraph,END
 
+from .state import ResponseState
 from config.config import config
 from .services.vector_store import VectorDBManager
 from .services.llm import LLMService
@@ -19,13 +20,13 @@ from .pipeline.retrieval import Retriever
 from .pipeline.reranker import Reranker
 from .pipeline.compression import ContextCompressor
 
+
 load_dotenv()
 
+class AgenticRAG():
 
-class Engine():
-    
     def __init__(self):
-
+    
         logger.info("......RAG engine is turning on...........")
 
         self.config = config
@@ -62,73 +63,58 @@ class Engine():
         self.compression = ContextCompressor()
         self.generator = LLMService(llm_model=self.llm_model_name, api_key=self.api_key)
 
+
+        self.workflow = StateGraph(ResponseState)
         logger.info("engine is live....")
-        
-    def run(self, query: str, eval_report: bool = False) -> Dict:
-        
-        logger.info(f"running a query")
-        logger.info(f"running on {self.device}")
 
-        logger.info(f"rewritting query....")
-        t0 = time.perf_counter()
-        rewritten_query = self.query_rewritter.rewrite(query=query)
-        
-        if not eval_report:
-            is_cache, cache_return = self.semantic_cache.get(rewritten_query)
-            
-            if is_cache:
-                logger.info(f"cach hit: returning instant response....")
-                info = cache_return
-                return info
-        
-        logger.info(f"retrieving from index....")
-        t1 = time.perf_counter()
-        retrieved_response = self.retriever.retrieve(
-            query=rewritten_query,
-            index=self.index,
-            top_k=20
-        )
-        retrieval_time = round(time.perf_counter()-t1, 2)
+        self.create_nodes()
+        self.create_edges()
+
+        logger.info("compiling graph....")
+        self.app = self.workflow.compile()
+
+
+    def cache_hit_router(self, state: ResponseState):
+        cache_hit = state.get("cache_hit")
+        return cache_hit
     
-        logger.info(f"reranking retrieved responses....")
-        t2 = time.perf_counter()
-        reranked_response = self.reranker.rerank(
-            query=rewritten_query,
-            retrieved_response=retrieved_response,
+
+    def create_nodes(self):
+
+        logger.info("creating graph nodes....")
+        self.workflow.add_node("query_rewriter_node", self.query_rewritter.rewrite)
+        self.workflow.add_node("semantic_cache_node", self.semantic_cache.get)
+        self.workflow.add_node("retriever_node", self.retriever.retrieve)
+        self.workflow.add_node("reranker_node", self.reranker.rerank)
+        self.workflow.add_node("context_compressor_node", self.compression.compress)
+        self.workflow.add_node("llm_service_node", self.generator.generate_response)
+
+    def create_edges(self):
+        logger.info("creating graph edges....")
+        self.workflow.set_entry_point("query_rewriter_node")
+        self.workflow.add_edge("query_rewriter_node", "semantic_cache_node")
+        self.workflow.add_conditional_edges(
+            "semantic_cache_node",
+            self.cache_hit_router,
+            {
+                True: END,
+                False: "retriever_node"
+            })
+        self.workflow.add_edge("retriever_node", "reranker_node")
+        self.workflow.add_edge("reranker_node", "context_compressor_node")
+        self.workflow.add_edge("context_compressor_node", "llm_service_node")
+        self.workflow.add_edge("llm_service_node", END)
+
+
+    def run_graph(self, query):
+
+        logger.info("graph is working on query....")
+        user_input = {"query": query}
+        result = self.app.invoke(
+            input=user_input
         )
-        reranking_time = round(time.perf_counter()-t2, 2) 
-        
-        logger.info(f"compressing reranked response....")
-        compressed_response = self.compression.compress(reranked_response)
 
-        logger.info(f"generating response....")
-        t3 = time.perf_counter()
-        result = self.generator.generate_response(rewritten_query, compressed_response)
-        generation_time = round(time.perf_counter()-t3, 2)
-        total_latency = round(time.perf_counter()-t0, 2)
-
-        result['retrieval_time'] = retrieval_time
-        result['reranking_time'] = reranking_time
-        result['generation_time'] = generation_time
-        result['total_latency'] = total_latency
-        result['cache_hit'] = False
-
-        if not eval_report:
-            embedded_query = cache_return
-
-            self.semantic_cache.store(
-                query=rewritten_query, 
-                result=result,
-                embedded_query=embedded_query,
-            )
-            return result
-        
-        if eval_report:
-            answer = result.get("answer")
-            context = [node.node.get_content() for node in compressed_response]
-            return {"answer": answer, "contexts": context}
-        
-        
-
+        logger.info("graph execution is over...")
+        return result
 
 

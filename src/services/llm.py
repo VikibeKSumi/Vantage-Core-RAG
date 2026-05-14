@@ -1,8 +1,9 @@
+from tenacity import retry, stop_after_attempt, wait_exponential, retry_if_exception_type
+from groq import RateLimitError, APIConnectionError
 from llama_index.llms.groq import Groq
 from llama_index.core.schema import MetadataMode
 
-from tenacity import retry, stop_after_attempt, wait_exponential, retry_if_exception_type
-from groq import RateLimitError, APIConnectionError
+from ..state import ResponseState
 
 class LLMService:
 
@@ -18,16 +19,18 @@ class LLMService:
         retry=retry_if_exception_type((RateLimitError, APIConnectionError)),
         reraise=True
     )
-    def  generate_response(self, query: str, context_nodes: list):
+    def  generate_response(self, state: ResponseState):
+        rewritten_query = state.get("rewritten_query")
+        compressed_nodes = state.get("compressed_nodes")
         """Returns answer + full token metrics (final version)."""
         context_text = "\n\n".join([
             node.node.get_content(metadata_mode=MetadataMode.NONE)
-            for node in context_nodes
+            for node in compressed_nodes
         ])
 
         prompt = (
             f"Context Information:\n{context_text}\n\n"
-            f"Query: {query}\n\n"
+            f"Query: {rewritten_query}\n\n"
             "As an Advisor, provide a concise, grounded answer based strictly on the context. "
             "If the information is not present, admit it. Match the query's language."
             "Always respond in English regardless of the language of the source documents. "

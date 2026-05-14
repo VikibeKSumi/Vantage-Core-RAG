@@ -1,4 +1,5 @@
 from groq import Groq
+from ..state import ResponseState
 
 class QueryRewriter():
 
@@ -6,7 +7,8 @@ class QueryRewriter():
         self.client = Groq(api_key=api_key)
         self.model = model_name
 
-    def rewrite(self, query: str) -> str:
+    def rewrite(self, state: ResponseState) -> str:
+        query = state.get("query")
         messages=[
             {"role": "system", "content": (
                 "You are a query rewriter for an Indian government policy document search system. "
@@ -31,4 +33,4 @@ class QueryRewriter():
             temperature=0
         )
 
-        return response.choices[0].message.content.strip()
+        return {"rewritten_query": response.choices[0].message.content.strip()}

@@ -2,7 +2,7 @@ from llama_index.core.schema import NodeWithScore
 from llama_index.core.postprocessor import SentenceTransformerRerank
 from typing import List
 
-
+from ..state import ResponseState
 
 class Reranker():
 
@@ -10,5 +10,11 @@ class Reranker():
         self.reranking_model = reranking_model
         
 
-    def rerank(self, query: str, retrieved_response: List[NodeWithScore]) -> List[NodeWithScore]:
-        return self.reranking_model.postprocess_nodes(retrieved_response, query_str=query)
+    def rerank(self, state: ResponseState) -> List[NodeWithScore]:
+        rewritten_query = state.get("rewritten_query")
+        retrieved_nodes = state.get("retrieved_nodes")
+
+        return {"reranked_nodes": self.reranking_model.postprocess_nodes(
+            retrieved_nodes, 
+            query_str=rewritten_query
+        )}

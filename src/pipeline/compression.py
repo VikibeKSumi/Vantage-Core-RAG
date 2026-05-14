@@ -1,15 +1,19 @@
+from typing import List
 from llama_index.core.postprocessor import LongContextReorder
 from llama_index.core.schema import NodeWithScore
-from typing import List
+
+from ..state import ResponseState
+
 
 class ContextCompressor:
     """Compresses retrieved context to reduce tokens sent to Groq."""
 
-    def __init__(self):
+    def __init__(self, ):
         self.reorder = LongContextReorder()
 
-    def compress(self, reranked_nodes: list[NodeWithScore], max_tokens: int = 1800) -> List[NodeWithScore]:
- 
+    def compress(self, state: ResponseState, max_tokens: int = 1800) -> List[NodeWithScore]:
+        reranked_nodes = state.get("reranked_nodes")
+        
         # Reorder for better LLM attention
         reordered = self.reorder.postprocess_nodes(reranked_nodes)
         
@@ -24,4 +28,4 @@ class ContextCompressor:
             compressed.append(node)
             total_tokens += node_tokens
 
-        return compressed
+        return {"compressed_nodes": compressed}

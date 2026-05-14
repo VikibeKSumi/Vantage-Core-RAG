@@ -9,9 +9,13 @@ from loguru import logger
 from redis import Redis
 from llama_index.embeddings.huggingface import HuggingFaceEmbedding
 
+from ..state import ResponseState
+
+
 class SemanticCache:
 
     def __init__(self, embedding_model: HuggingFaceEmbedding, cache_similarity_threshold: float = 0.85):
+        
         self.embedding_model = embedding_model
         self.cache_similarity_threshold = cache_similarity_threshold
         logger.info("loading redis....")
@@ -30,16 +34,18 @@ class SemanticCache:
             self.cache[_key] = _value
 
 
-    def get(self, query: str) -> tuple:
+    def get(self, state: ResponseState) -> tuple:
+
+        rewritten_query = state.get("rewritten_query")
 
         embedded_query = torch.tensor(
             self.embedding_model.get_text_embedding(
-                query
+                rewritten_query
         ))
 
         if not self.cache:
             # cache is empty
-            return None, embedded_query
+            return {"cache_hit": None, "embedded_query": embedded_query}
         
         for cached_query, info in self.cache.items():
             cached_emb = info.get("embedding")
@@ -51,11 +57,13 @@ class SemanticCache:
 
             if similarity >= self.cache_similarity_threshold:
                 # cache match
-                return True, {**info["result"], "cache_hit":True}
+                return {"cache_hit": True, 
+                        "embedded_query": embedded_query,
+                        "answer": info.get("result")}
 
 
         # cache no match
-        return False, embedded_query
+        return {"cache_hit": False, "embedded_query": embedded_query}
 
     def store(self, query: str, result: dict, embedded_query: torch.tensor):
     

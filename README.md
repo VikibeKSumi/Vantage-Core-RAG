@@ -149,5 +149,5 @@ vantage_core_rag/
 - Graph based knowledge
 - Persistent cache with Redis
 - Cloud based deployment
--
+
 ---
